@@ -43,9 +43,13 @@ export default function IngredientScreen (props) {
     setPageNumber(newPageNumber + 1);
   }
 
+  const goIngredientDetail = (item) => {
+    props.navigation.push('IngredientDetail', { passProps: item })
+  }
+
   const renderIngredient = (item) => {
     return (
-      <TouchableOpacity>
+      <TouchableOpacity onPress={ () => goIngredientDetail(item) }>
         <View>
           <View style={styles.mainView}>
             <View style={{ flex: 1 }}>
@@ -53,7 +57,7 @@ export default function IngredientScreen (props) {
                 { item.id + item.food_type }
               </Text>
               <Text ellipsizeMode='tail' numberOfLines={3} style={{ marginTop: 8, fontSize: 13, marginBottom: 8 }}>
-                { item.name }
+                { item.name }{ item.en_name && ` (${item.en_name})` }
               </Text>
             </View>
           </View>
