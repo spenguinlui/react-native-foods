@@ -98,8 +98,33 @@ const Router = () => (
   <NavigationContainer>
     <Tab.Navigator
       initialRouteName='Home'
-      screenOptions={ () => ({
-        tabBarIcon: () => ( <Ionicons name={'ios-list'} size={25} /> )
+      screenOptions={ ({route}) => ({
+        tabBarIcon: ({color, focused}) => {
+          const iconList = ['ios-heart-outline', 'ios-heart']
+          let iconName = '';
+          switch (route.name) {
+            case 'Home':
+              iconName = focused ? 'ios-home' : 'ios-home-outline';
+              break;
+            case 'Ingredient':
+              iconName = focused ? 'ios-fast-food' : 'ios-fast-food-outline';
+              break;
+            case 'Favorite':
+              iconName = focused ? 'ios-heart' : 'ios-heart-outline';
+              break;
+            case 'Cook':
+              iconName = focused ? 'ios-restaurant' : 'ios-restaurant-outline';
+              break;
+            case 'Recipe':
+              iconName = focused ? 'ios-book' : 'ios-book-outline';
+              break;
+            default:
+              iconName = focused ? 'ios-list' : 'ios-list-outline'
+          }
+          return (
+            <Ionicons name={iconName} size={25} />
+          )
+        }
       }) }
       tabBarOptions={ {
         activeTintColor: 'tomato',
@@ -108,8 +133,8 @@ const Router = () => (
     >
       <Tab.Screen name="Home" component={ HomeStack } />
       <Tab.Screen name="Ingredient" component={ IngredientStack } />
-      <Tab.Screen name="Favorite" component={ FavoriteStack } />
       <Tab.Screen name="Cook" component={ CookScreen } />
+      <Tab.Screen name="Favorite" component={ FavoriteStack } />
       <Tab.Screen name="Recipe" component={ RecipeStack } />
     </Tab.Navigator>
   </NavigationContainer>

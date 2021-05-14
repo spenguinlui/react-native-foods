@@ -1,10 +1,11 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Button, FlatList } from 'react-native';
-import * as StorageHelper from '../helper/StorageHelper'
-import jsonData from '../json/food_data.json'
-import { useMappedState, useDispatch } from 'redux-react-hook'
-import { changeFavoritesCount } from '../redux/action'
+import { StyleSheet, Text, View, TouchableOpacity, FlatList } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import * as StorageHelper from '../helper/StorageHelper';
+import jsonData from '../json/food_data.json';
+import { useMappedState, useDispatch } from 'redux-react-hook';
+import { changeFavoritesCount } from '../redux/action';
 
 const HeaderList = (props) => {
   const headerArray = Object.keys(jsonData)
@@ -84,7 +85,9 @@ export default function IngredientScreen (props) {
                 { item.name }{ item.en_name && ` (${item.en_name})` }
               </Text>
             </View>
-            <Button title='+' onPress={() => addToFavorites(item)} />
+            <TouchableOpacity onPress={() => addToFavorites(item)}>
+              <Ionicons name={'ios-add-circle-outline'} size={20} />
+            </TouchableOpacity>
           </View>
           <View style={styles.seperator}/>
         </View>

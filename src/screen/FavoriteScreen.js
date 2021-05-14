@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Button, FlatList } from 'react-native';
-import * as StorageHelper from '../helper/StorageHelper'
-import { useMappedState, useDispatch } from 'redux-react-hook'
-import { changeFavoritesCount } from '../redux/action'
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import * as StorageHelper from '../helper/StorageHelper';
+import { useMappedState, useDispatch } from 'redux-react-hook';
+import { changeFavoritesCount } from '../redux/action';
 
 export default function FavoritesScreen ({navigation}) {
   const [dataSource, setDataSource] = useState([]);
@@ -48,7 +49,9 @@ export default function FavoritesScreen ({navigation}) {
                 { item.name }{ item.en_name && ` (${item.en_name})` }
               </Text>
             </View>
-            <Button title='-' onPress={() => removeFromFavorites(item)} />
+            <TouchableOpacity onPress={() => removeFromFavorites(item)}>
+              <Ionicons name={'ios-trash-outline'} size={20} />
+            </TouchableOpacity>
           </View>
           <View style={styles.seperator}/>
         </View>
