@@ -1,31 +1,132 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, FlatList } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, Image, TouchableOpacity, FlatList, Button } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import * as StorageHelper from '../helper/StorageHelper';
 import jsonData from '../json/food_data.json';
 import { useMappedState, useDispatch } from 'redux-react-hook';
 import { changeFavoritesCount } from '../redux/action';
 
+const DEFAULT_FOOD_TYPE = 'seafoods'
+
+// 食物圖片元件
+const IconImage = (title, activeIcon) => {
+  switch (title) {
+    case 'fruit':
+      return (<Image style={title === activeIcon ? styles.activeImage : styles.image} source={require('../images/fruit.png')}/>);
+    case 'prepared_and_other':
+      return (<Image style={title === activeIcon ? styles.activeImage : styles.image} source={require('../images/prepared_and_other.png')}/>);
+    case 'meat':
+      return (<Image style={title === activeIcon ? styles.activeImage : styles.image} source={require('../images/meat.png')}/>);
+    case 'legume':
+      return (<Image style={title === activeIcon ? styles.activeImage : styles.image} source={require('../images/legume.png')}/>);
+    case 'milk':
+      return (<Image style={title === activeIcon ? styles.activeImage : styles.image} source={require('../images/milk.png')}/>);
+    case 'fat':
+      return (<Image style={title === activeIcon ? styles.activeImage : styles.image} source={require('../images/fat.png')}/>);
+    case 'nut':
+      return (<Image style={title === activeIcon ? styles.activeImage : styles.image} source={require('../images/nut.png')}/>);
+    case 'egg':
+      return (<Image style={title === activeIcon ? styles.activeImage : styles.image} source={require('../images/egg.png')}/>);
+    case 'seafoods':
+      return (<Image style={title === activeIcon ? styles.activeImage : styles.image} source={require('../images/seafoods.png')}/>);
+    case 'mushroom':
+      return (<Image style={title === activeIcon ? styles.activeImage : styles.image} source={require('../images/mushroom.png')}/>);
+    case 'drink':
+      return (<Image style={title === activeIcon ? styles.activeImage : styles.image} source={require('../images/drink.png')}/>);
+    case 'grains':
+      return (<Image style={title === activeIcon ? styles.activeImage : styles.image} source={require('../images/grains.png')}/>);
+    case 'vegetable':
+      return (<Image style={title === activeIcon ? styles.activeImage : styles.image} source={require('../images/vegetable.png')}/>);
+    case 'seasoning':
+      return (<Image style={title === activeIcon ? styles.activeImage : styles.image} source={require('../images/seasoning.png')}/>);
+    case 'starch':
+      return (<Image style={title === activeIcon ? styles.activeImage : styles.image} source={require('../images/starch.png')}/>);
+    case 'pastry':
+      return (<Image style={title === activeIcon ? styles.activeImage : styles.image} source={require('../images/pastry.png')}/>);
+    case 'sugar':
+      return (<Image style={title === activeIcon ? styles.activeImage : styles.image} source={require('../images/sugar.png')}/>);
+    case 'alga':
+      return (<Image style={title === activeIcon ? styles.activeImage : styles.image} source={require('../images/alga.png')}/>);
+    default:
+      return (<Image style={title === activeIcon ? styles.activeImage : styles.image} source={require('../images/undefined.png')}/>);
+  }
+}
+
+// 食物中英文置換
+const foodTypeToZhTw = (title) => {
+  switch (title) {
+    case 'fruit':
+      return '水果類';
+    case 'prepared_and_other':
+      return '加工調理食品及其他類'
+    case 'meat':
+      return '肉類';
+    case 'legume':
+      return '豆類';
+    case 'milk':
+      return '乳品類';
+    case 'fat':
+      return '油脂類';
+    case 'nut':
+      return '堅果類';
+    case 'egg':
+      return '蛋類';
+    case 'seafoods':
+      return '魚貝類';
+    case 'mushroom':
+      return '菇類';
+    case 'drink':
+      return '飲料類';
+    case 'grains':
+      return '穀物類';
+    case 'vegetable':
+      return '蔬菜類';
+    case 'seasoning':
+      return '調味料及香辛料類';
+    case 'starch':
+      return '澱粉類';
+    case 'pastry':
+      return '糕餅點心類';
+    case 'sugar':
+      return '糖類';
+    case 'alga':
+      return '藻類';
+    default:
+      return '未定義類型';
+  }
+}
+
 const HeaderList = (props) => {
   const headerArray = Object.keys(jsonData)
+  const [activeIcon, setActiveIcon] = useState(DEFAULT_FOOD_TYPE);
 
   const changeIngredientType = (title) => {
     props.setIngredientType(title);
     props.setPageNumber(1);
+    setActiveIcon(title);
   }
 
   return (
-    <View style={styles.mainView}>
+    <View>
+      <ScrollView
+        style={styles.header}
+        horizontal={true}
+      >
       { headerArray.map((title) => {
+        if (title === 'undefined') return;  // 按下去會掛掉 todo: 待修正
         return (
           <TouchableOpacity key={title} onPress={ () => changeIngredientType(title) }>
             <View>
-              <Text>{title}</Text>
+              { IconImage(title, activeIcon) }
             </View>
           </TouchableOpacity>
         )
       }) }
+      </ScrollView>
+      <View>
+        <Text>現在食材類型是: { foodTypeToZhTw(activeIcon) }</Text>
+      </View>
     </View>
   )
 }
@@ -34,7 +135,7 @@ export default function IngredientScreen (props) {
   const [dataSource, setDataSource] = useState([]);
   const [pageNumber, setPageNumber] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
-  const [ingredientType, setIngredientType] = useState('seafoods');
+  const [ingredientType, setIngredientType] = useState(DEFAULT_FOOD_TYPE);
   const favoritsCountFromStore = useMappedState(state => state.favoritsCount)
   const disPatch = useDispatch()
 
@@ -73,6 +174,7 @@ export default function IngredientScreen (props) {
   }
 
   const renderIngredient = (item) => {
+    // if (!item.id) return;
     return (
       <TouchableOpacity onPress={ () => goIngredientDetail(item) }>
         <View>
@@ -135,6 +237,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  header: {
+    height: 40,
+    flexDirection: 'row',
+  },
   mainView: {
     height: 80,
     flexDirection: 'row',
@@ -148,7 +254,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#dddddd'
   },
   image: {
-    width: 20,
-    height: 40
+    width: 40,
+    height: 40,
+  },
+  activeImage: {
+    width: 40,
+    height: 40,
+    backgroundColor: "#000"
   }
 });
