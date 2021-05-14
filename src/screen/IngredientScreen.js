@@ -1,7 +1,10 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Button, FlatList } from 'react-native';
+import * as StorageHelper from '../helper/StorageHelper'
 import jsonData from '../json/food_data.json'
+import { useMappedState, useDispatch } from 'redux-react-hook'
+import { changeFavoritesCount } from '../redux/action'
 
 const HeaderList = (props) => {
   const headerArray = Object.keys(jsonData)
@@ -30,7 +33,9 @@ export default function IngredientScreen (props) {
   const [dataSource, setDataSource] = useState([]);
   const [pageNumber, setPageNumber] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
-  const [ingredientType, setIngredientType] = useState('seafoods')
+  const [ingredientType, setIngredientType] = useState('seafoods');
+  const favoritsCountFromStore = useMappedState(state => state.favoritsCount)
+  const disPatch = useDispatch()
 
   const getPageData = (num) => {
     const renderData = [];
@@ -44,7 +49,26 @@ export default function IngredientScreen (props) {
   }
 
   const goIngredientDetail = (item) => {
-    props.navigation.push('IngredientDetail', { passProps: item })
+    props.navigation.push('IngredientDetail', { passProps: item });
+  }
+
+  const addToFavorites = async (item) => {
+    try {
+      const origin_favorites = await StorageHelper.getJsonArraySetting('favorites');
+      const find_data = origin_favorites.find((data) => {
+        return data.id == item.id
+      })
+      if (find_data) {
+        console.log('已經加入過了');
+        return;
+      }
+      await StorageHelper.setJsonArraySetting('favorites', item);
+      console.log(`更新數量為${favoritsCountFromStore}`);
+      await disPatch(changeFavoritesCount(favoritsCountFromStore + 1));
+      console.log(`更新數量為${favoritsCountFromStore}`);
+    } catch(error) {
+      console.log('寫入失敗', error);
+    }
   }
 
   const renderIngredient = (item) => {
@@ -60,6 +84,7 @@ export default function IngredientScreen (props) {
                 { item.name }{ item.en_name && ` (${item.en_name})` }
               </Text>
             </View>
+            <Button title='+' onPress={() => addToFavorites(item)} />
           </View>
           <View style={styles.seperator}/>
         </View>
@@ -74,6 +99,7 @@ export default function IngredientScreen (props) {
 
   useEffect(() => {
     console.log(`現在筆數${pageNumber * 10}`)
+    console.log(`現在 store 為${favoritsCountFromStore}`);
     const renderData = getPageData(pageNumber);
     setDataSource(renderData);
     setIsLoading(false);
@@ -81,7 +107,7 @@ export default function IngredientScreen (props) {
 
   return (
     <View>
-      <Text>我是食材清單</Text>
+      <Text>我是食材清單, 現在珍藏清單有{favoritsCountFromStore}</Text>
       <FlatList
         data={dataSource}
         ListHeaderComponent={ <HeaderList setIngredientType={setIngredientType} setPageNumber={setPageNumber}></HeaderList> }
@@ -95,9 +121,6 @@ export default function IngredientScreen (props) {
         onEndReachedThreshold= { 0.01 }
         refreshing={isLoading}
       />
-      <TouchableOpacity>
-        <Button title='前往食材細節' onPress={() => props.navigation.push('IngredientDetail')} />
-      </TouchableOpacity>
     </View>
   )
 }
