@@ -131,10 +131,11 @@ const HeaderList = (props) => {
   )
 }
 
-export default function IngredientScreen (props) {
+export default function IngredientScreen ({navigation}) {
   const [dataSource, setDataSource] = useState([]);
   const [pageNumber, setPageNumber] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const [disableArrived, setDisableArrived] = useState('');
   const [ingredientType, setIngredientType] = useState(DEFAULT_FOOD_TYPE);
   const favoritsCountFromStore = useMappedState(state => state.favoritsCount)
   const disPatch = useDispatch()
@@ -151,7 +152,8 @@ export default function IngredientScreen (props) {
   }
 
   const goIngredientDetail = (item) => {
-    props.navigation.push('IngredientDetail', { passProps: item });
+    setDisableArrived(item.id)
+    navigation.push('IngredientDetail', { passProps: item, key: item.id });
   }
 
   const addToFavorites = async (item) => {
@@ -174,9 +176,12 @@ export default function IngredientScreen (props) {
   }
 
   const renderIngredient = (item) => {
-    // if (!item.id) return;
     return (
-      <TouchableOpacity onPress={ () => goIngredientDetail(item) }>
+      <TouchableOpacity
+        onPress={ () => goIngredientDetail(item) }
+        key={item.id}
+        disabled={ disableArrived == item.id ? true : false }
+      >
         <View>
           <View style={styles.mainView}>
             <View style={{ flex: 1 }}>
@@ -202,6 +207,14 @@ export default function IngredientScreen (props) {
     setPageNumber(1);
   }
 
+  // 每次進來都要先重設
+  useEffect(() => {
+    const resetDisabledButton = navigation.addListener('focus', (e) => {
+      setDisableArrived('');
+    });
+    return resetDisabledButton;
+  }, [navigation]);
+
   useEffect(() => {
     console.log(`現在筆數${pageNumber * 10}`)
     console.log(`現在 store 為${favoritsCountFromStore}`);
@@ -217,7 +230,7 @@ export default function IngredientScreen (props) {
         data={dataSource}
         ListHeaderComponent={ <HeaderList setIngredientType={setIngredientType} setPageNumber={setPageNumber}></HeaderList> }
         renderItem={({item}) => renderIngredient(item)}
-        keyExtractor={item => item.id}
+        keyExtractor={(item) => item.id}
         getItemLayout={(data, index) => (
           {length: 80, offset: 80 + (80 * index), index}
         )}

@@ -7,6 +7,7 @@ import { changeFavoritesCount } from '../redux/action';
 
 export default function FavoritesScreen ({navigation}) {
   const [dataSource, setDataSource] = useState([]);
+  const [disableArrived, setDisableArrived] = useState('');
   const favoritsCountFromStore = useMappedState(state => state.favoritsCount);
 
   const disPatch = useDispatch();
@@ -23,7 +24,8 @@ export default function FavoritesScreen ({navigation}) {
   }
 
   const goIngredientDetail = (item) => {
-    navigation.push('IngredientDetail', { passProps: item });
+    setDisableArrived(item.id)
+    navigation.push('IngredientDetail', { passProps: item, key: item.id });
   }
 
   // 移除珍藏，要同步 redux 數量
@@ -38,7 +40,11 @@ export default function FavoritesScreen ({navigation}) {
 
   const renderIngredient = (item) => {
     return (
-      <TouchableOpacity onPress={ () => goIngredientDetail(item) }>
+      <TouchableOpacity
+        onPress={ () => goIngredientDetail(item) }
+        key={item.id}
+        disabled={ disableArrived == item.id ? true : false }
+      >
         <View>
           <View style={styles.mainView}>
             <View style={{ flex: 1 }}>
@@ -62,6 +68,7 @@ export default function FavoritesScreen ({navigation}) {
   // 每次進來都要先重設收藏數量
   useEffect(() => {
     const refreshFavorites = navigation.addListener('focus', (e) => {
+      setDisableArrived('');
       loadStorageData();
     });
     return refreshFavorites;
@@ -81,7 +88,7 @@ export default function FavoritesScreen ({navigation}) {
       <FlatList
         data={dataSource}
         renderItem={({item}) => renderIngredient(item)}
-        keyExtractor={item => item.id}
+        keyExtractor={(item) => item.id}
         getItemLayout={(data, index) => (
           {length: 80, offset: 80 * index, index}
         )}

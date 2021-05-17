@@ -4,7 +4,7 @@ import { Text, View, ScrollView } from 'react-native';
 export default function IngredientDetail (props) {
   const data = props.route.params.passProps || {}
   return (
-    <ScrollView>
+    <ScrollView key={props.route.params.key}>
       <Text>我是食材細節</Text>
       <Text>類型: {data.food_type}</Text>
       <Text>名字: {data.name}</Text>
