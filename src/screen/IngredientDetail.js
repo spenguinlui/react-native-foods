@@ -24,9 +24,9 @@ export default function IngredientDetail (props) {
               <Text>含量單位: {nu_data.unit_content}</Text>
               <Text>每單位含量: {nu_data.per_content}</Text>
               <Text>每單位重: {nu_data.per_100_content}</Text>
-              <Text>每單位重含量: {nu_data.per_weight}</Text>
-              <Text>樣本數: {nu_data.per_weight_content}</Text>
-              <Text>標準差: {nu_data.sample_count}</Text>
+              {/* <Text>每單位重含量: {nu_data.per_weight}</Text> */}
+              {/* <Text>樣本數: {nu_data.per_weight_content}</Text> */}
+              {/* <Text>標準差: {nu_data.sample_count}</Text> */}
               <Text>－－－－－－－</Text>
             </View>
           )

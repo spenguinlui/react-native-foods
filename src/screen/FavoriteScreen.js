@@ -12,6 +12,7 @@ export default function FavoritesScreen ({navigation}) {
 
   const disPatch = useDispatch();
 
+  // 讀取儲存資料
   const loadStorageData = async () => {
     // disPatch(changeFavoritesCount(0));
     const gotData = await StorageHelper.getJsonArraySetting('favorites');
@@ -23,12 +24,13 @@ export default function FavoritesScreen ({navigation}) {
     setDataSource(gotData);
   }
 
+  // 前往食材細節
   const goIngredientDetail = (item) => {
-    setDisableArrived(item.id)
+    setDisableArrived(item.id);
     navigation.push('IngredientDetail', { passProps: item, key: item.id });
   }
 
-  // 移除珍藏，要同步 redux 數量
+  // 移除我的最愛，要同步 redux 數量
   const removeFromFavorites = async (item) => {
     try {
       await StorageHelper.removeJsonArraySetting('favorites', item);
@@ -38,36 +40,34 @@ export default function FavoritesScreen ({navigation}) {
     }
   }
 
-  const renderIngredient = (item) => {
-    return (
-      <TouchableOpacity
-        onPress={ () => goIngredientDetail(item) }
-        key={item.id}
-        disabled={ disableArrived == item.id ? true : false }
-      >
-        <View>
-          <View style={styles.mainView}>
-            <View style={{ flex: 1 }}>
-              <Text ellipsizeMode='tail' numberOfLines={3} style={{ color: 'black', fontSize: 15, marginTop: 8 }}>
-                { item.id + item.food_type }
-              </Text>
-              <Text ellipsizeMode='tail' numberOfLines={3} style={{ marginTop: 8, fontSize: 13, marginBottom: 8 }}>
-                { item.name }{ item.en_name && ` (${item.en_name})` }
-              </Text>
-            </View>
-            <TouchableOpacity onPress={() => removeFromFavorites(item)}>
-              <Ionicons name={'ios-trash-outline'} size={20} />
-            </TouchableOpacity>
+  const renderIngredient = (item) => (
+    <TouchableOpacity
+      onPress={ () => goIngredientDetail(item) }
+      key={item.id}
+      disabled={ disableArrived == item.id ? true : false }
+    >
+      <View>
+        <View style={styles.mainView}>
+          <View style={{ flex: 1 }}>
+            <Text ellipsizeMode='tail' numberOfLines={3} style={{ color: 'black', fontSize: 15, marginTop: 8 }}>
+              { item.id + item.food_type }
+            </Text>
+            <Text ellipsizeMode='tail' numberOfLines={3} style={{ marginTop: 8, fontSize: 13, marginBottom: 8 }}>
+              { item.name }{ item.en_name && ` (${item.en_name})` }
+            </Text>
           </View>
-          <View style={styles.seperator}/>
+          <TouchableOpacity onPress={() => removeFromFavorites(item)}>
+            <Ionicons name={'ios-trash-outline'} size={20} />
+          </TouchableOpacity>
         </View>
-      </TouchableOpacity>
-    )
-  }
+        <View style={styles.seperator}/>
+      </View>
+    </TouchableOpacity>
+  )
 
   // 每次進來都要先重設收藏數量
   useEffect(() => {
-    const refreshFavorites = navigation.addListener('focus', (e) => {
+    const refreshFavorites = navigation.addListener('focus', () => {
       setDisableArrived('');
       loadStorageData();
     });
@@ -79,6 +79,7 @@ export default function FavoritesScreen ({navigation}) {
     loadStorageData();
     console.log('執行了 favoritsCount effect');
   }, [favoritsCountFromStore])
+
   return (
     <View>
       <Text>favoritsCountFromStore: {favoritsCountFromStore}</Text>
