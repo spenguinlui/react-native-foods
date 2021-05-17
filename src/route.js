@@ -100,7 +100,6 @@ const Router = () => (
       initialRouteName='Home'
       screenOptions={ ({route}) => ({
         tabBarIcon: ({color, focused}) => {
-          const iconList = ['ios-heart-outline', 'ios-heart']
           let iconName = '';
           switch (route.name) {
             case 'Home':
