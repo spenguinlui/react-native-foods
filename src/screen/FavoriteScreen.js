@@ -3,12 +3,13 @@ import { StyleSheet, Text, View, TouchableOpacity, Button, FlatList } from 'reac
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import * as StorageHelper from '../helper/StorageHelper';
 import { useMappedState, useDispatch } from 'redux-react-hook';
-import { changeFavoritesCount } from '../redux/action';
+import { changeFavoritesCount, addToPrepareCookingList, removeFromPrepareCookingList } from '../redux/action';
 
 export default function FavoritesScreen ({navigation}) {
   const [dataSource, setDataSource] = useState([]);
   const [disableArrived, setDisableArrived] = useState('');
   const favoritsCountFromStore = useMappedState(state => state.favoritsCount);
+  const prepareCookingList = useMappedState(state => state.prepareCookingList);
 
   const disPatch = useDispatch();
 
@@ -40,6 +41,25 @@ export default function FavoritesScreen ({navigation}) {
     }
   }
 
+  // 增加/移除 準備料理 store
+  const preparedCookingListHandler = (item) => {
+    if (prepareCookingList.find((inItem) => inItem.id === item.id)) {
+      try {
+        disPatch(removeFromPrepareCookingList(item))
+        console.log('移除待煮成功', prepareCookingList.length);
+      } catch(error) {
+        console.log('移除待煮清單失敗', error);
+      }
+    } else {
+      try {
+        disPatch(addToPrepareCookingList(item));
+        console.log('加入待煮成功', prepareCookingList.length);
+      } catch(error) {
+        console.log('加入待煮清單失敗', error);
+      }
+    }
+  }
+
   const renderIngredient = (item) => (
     <TouchableOpacity
       onPress={ () => goIngredientDetail(item) }
@@ -48,6 +68,9 @@ export default function FavoritesScreen ({navigation}) {
     >
       <View>
         <View style={styles.mainView}>
+          <TouchableOpacity onPress={() => preparedCookingListHandler(item)}>
+            <Ionicons name={ prepareCookingList.find((inItem) => inItem.id === item.id) ? 'ios-checkbox-outline' : 'ios-stop-outline'} size={25} />
+          </TouchableOpacity>
           <View style={{ flex: 1 }}>
             <Text ellipsizeMode='tail' numberOfLines={3} style={{ color: 'black', fontSize: 15, marginTop: 8 }}>
               { item.id + item.food_type }
@@ -57,7 +80,7 @@ export default function FavoritesScreen ({navigation}) {
             </Text>
           </View>
           <TouchableOpacity onPress={() => removeFromFavorites(item)}>
-            <Ionicons name={'ios-trash-outline'} size={20} />
+            <Ionicons name={'ios-trash-outline'} size={25} />
           </TouchableOpacity>
         </View>
         <View style={styles.seperator}/>
@@ -78,7 +101,7 @@ export default function FavoritesScreen ({navigation}) {
   useEffect(() => {
     loadStorageData();
     console.log('執行了 favoritsCount effect');
-  }, [favoritsCountFromStore])
+  }, [favoritsCountFromStore, prepareCookingList])
 
   return (
     <View>
