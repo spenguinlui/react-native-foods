@@ -1,4 +1,4 @@
-import { CHANGE_FAVORITES_COUNT, ADD_TO_PREPARECOOKING_LIST, REMOVE_FROM_PREPARECOOKING_LIST } from './action'
+import { CHANGE_FAVORITES_COUNT, ADD_TO_PREPARECOOKING_LIST, REMOVE_FROM_PREPARECOOKING_LIST, REMOVE_ALL_PREPARECOOKING_LIST } from './action'
 
 const initialState = {
   favoritsCount: 0,
@@ -25,6 +25,11 @@ export default function reducer(state = initialState, action) {
       return {
         ...state,
         prepareCookingList: removedList
+      }
+    case REMOVE_ALL_PREPARECOOKING_LIST:
+      return {
+        ...state,
+        prepareCookingList: []
       }
     default:
       return state

@@ -18,7 +18,9 @@ export const setJsonArraySetting = (key, value) => {
 export const removeJsonArraySetting = (key, value) => {
   AsyncStorage.getItem(key)
     .then(JSON.parse)
-    .then(data => data.filter(current => current.id !== value.id))
+    .then(data => data.filter((current) => {
+      if(current.id) return current.id !== value.id;
+      if(current.name) return current.name !== value.name;
+    } ))
     .then(filteredData => AsyncStorage.setItem(key, JSON.stringify(filteredData)))
-    .then(console.log('step1 改好了'))
 }

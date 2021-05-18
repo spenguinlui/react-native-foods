@@ -5,7 +5,7 @@ import { useState } from 'react/cjs/react.development';
 import * as StorageHelper from '../helper/StorageHelper';
 
 import { useMappedState, useDispatch } from 'redux-react-hook';
-import { addToPrepareCookingList, removeFromPrepareCookingList } from '../redux/action';
+import { removeAllPrepareCookingList } from '../redux/action';
 
 
 export default function CookScreen ({navigation}) {
@@ -51,15 +51,21 @@ export default function CookScreen ({navigation}) {
     setRecipe(newRecipe);
     console.log(newRecipe.ingredient, newRecipe.nutrient_content.length)
     console.log('進入烹煮')
-    // todo: 要清空 prepareCookingList
+    disPatch(removeAllPrepareCookingList())
   }
 
-  const addRecipeToStorage = () => {
+  const addRecipeToStorage = async () => {
     try {
+      const oringinRecipe = await StorageHelper.getJsonArraySetting('recipe');
+      if (oringinRecipe.find((item) => item.name === recipe.name)) {
+        console.log("食譜撞名囉！");
+        return;
+      }
       StorageHelper.setJsonArraySetting('recipe', recipe);
+      setRecipe({name: '', ingredient: [], nutrient_content: []})
       console.log("加入食譜成功");
     } catch(error) {
-      console.log("加入食譜失敗");
+      console.log("加入食譜失敗", error);
     }
   }
 
@@ -73,8 +79,8 @@ export default function CookScreen ({navigation}) {
 
   return (
     <View style={styles.container}>
-      { prepareCookingList.length && <Text>目前食材列表:</Text> }
-      { prepareCookingList.map((item, index) => <Text>{`${index}: ${item.name}`}</Text>)}
+      { prepareCookingList.length ? <Text>目前食材列表:</Text> : <View></View> }
+      { prepareCookingList.length ? prepareCookingList.map((item, index) => <Text>{`${index}: ${item.name}`}</Text>) : <View></View>}
       { recipe.ingredient.length > 0 && (
         <View>
           <Text>已新增料理！ 料理名稱: { recipe.name }</Text>
