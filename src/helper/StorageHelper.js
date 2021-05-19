@@ -24,3 +24,12 @@ export const removeJsonArraySetting = (key, value) => {
     } ))
     .then(filteredData => AsyncStorage.setItem(key, JSON.stringify(filteredData)))
 }
+export const patchJsonArraySetting = (key, value) => {
+  AsyncStorage.getItem(key)
+    .then(JSON.parse)
+    .then((data) => data.map((current) => (current.id === value.id ? value : current)))
+    .then(patchedData => AsyncStorage.setItem(key, JSON.stringify(patchedData)))
+}
+export const resetJsonArraySetting = (key) => {
+  AsyncStorage.setItem(key, JSON.stringify([]))
+}

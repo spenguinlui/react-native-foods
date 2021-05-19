@@ -12,6 +12,7 @@ export default function RecipeScreen (props) {
     console.log('得到資料了', gotData)
   }
 
+  // 移除食譜
   const removeRecipe = async (item) => {
     await StorageHelper.removeJsonArraySetting('recipe',item );
     const gotData = await StorageHelper.getJsonArraySetting('recipe');
@@ -19,6 +20,7 @@ export default function RecipeScreen (props) {
     console.log('移除該食譜, 新食譜資料:', gotData)
   }
 
+  // 
   const renderRecipe = (item) => (
     <View>
       <View style={styles.mainView}>
@@ -27,11 +29,11 @@ export default function RecipeScreen (props) {
             食譜名稱: { item.name }
           </Text>
           <Text ellipsizeMode='tail' numberOfLines={3} style={{ marginTop: 8, fontSize: 13, marginBottom: 8 }}>
-            材料: { item.ingredient.map((name) => name) }, 營養成分數量: { item.nutrient_content.length }
+            材料: { item.ingredient.map((name) => `${name} .`) }
           </Text>
         </View>
         <TouchableOpacity>
-          <Button title='>>細節' onPress={() => props.navigation.push('RecipeDetail')} />
+          <Button title='>>細節' onPress={() => props.navigation.push('RecipeDetail', { data: item })} />
           <Button title='-' onPress={() => removeRecipe(item)} />
         </TouchableOpacity>
       </View>

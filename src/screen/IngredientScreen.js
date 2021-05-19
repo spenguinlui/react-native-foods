@@ -18,9 +18,10 @@ export default function IngredientScreen ({navigation}) {
   const [isLoading, setIsLoading] = useState(false);
   const [disableArrived, setDisableArrived] = useState('');
   const [ingredientType, setIngredientType] = useState(DEFAULT_FOOD_TYPE);
+  const [preparedCount, setPreparedCount] = useState(0);  // 用來記錄現在已準備食材數量
 
   const favoritsCountFromStore = useMappedState(state => state.favoritsCount);
-  const prepareCookingList = useMappedState(state => state.prepareCookingList);
+  const prepareIdList = useMappedState(state => state.prepareIdList);
   const disPatch = useDispatch();
 
   // 讀取 JSON/API 資料
@@ -66,18 +67,22 @@ export default function IngredientScreen ({navigation}) {
   };
 
   // 增加/移除 準備料理 store
-  const preparedCookingListHandler = (item) => {
-    if (prepareCookingList.find((inItem) => inItem.id === item.id)) {
+  const preparedCookingListHandler = async (item) => {
+    if (prepareIdList.find((itemId) => itemId === item.id)) {
       try {
-        disPatch(removeFromPrepareCookingList(item))
-        console.log('移除待煮成功', prepareCookingList.length);
+        await StorageHelper.removeJsonArraySetting('prepared', item);
+        await disPatch(removeFromPrepareCookingList(item.id));
+        setPreparedCount(preparedCount - 1);
+        console.log('移除待煮成功', prepareIdList.length);
       } catch(error) {
         console.log('移除待煮清單失敗', error);
       }
     } else {
       try {
-        disPatch(addToPrepareCookingList(item));
-        console.log('加入待煮成功', prepareCookingList.length);
+        await StorageHelper.setJsonArraySetting('prepared', item);
+        await disPatch(addToPrepareCookingList(item.id));
+        setPreparedCount(preparedCount + 1);
+        console.log('加入待煮成功', prepareIdList.length);
       } catch(error) {
         console.log('加入待煮清單失敗', error);
       }
@@ -94,7 +99,7 @@ export default function IngredientScreen ({navigation}) {
       <View>
         <View style={styles.mainView}>
           <TouchableOpacity onPress={() => preparedCookingListHandler(item)}>
-            <Ionicons name={ prepareCookingList.find((inItem) => inItem.id === item.id) ? 'ios-checkbox-outline' : 'ios-stop-outline'} size={25} />
+            <Ionicons name={ prepareIdList.find((itemId) => itemId === item.id) ? 'ios-checkbox-outline' : 'ios-stop-outline'} size={25} />
           </TouchableOpacity>
           <View style={{ flex: 1 }}>
             <Text ellipsizeMode='tail' numberOfLines={3} style={{ color: 'black', fontSize: 15, marginTop: 8 }}>
@@ -125,7 +130,7 @@ export default function IngredientScreen ({navigation}) {
   useEffect(() => {
     console.log(`現在筆數${pageNumber * 10}`)
     console.log(`現在 store 為${favoritsCountFromStore}`);
-    const renderData = getPageData(pageNumber);
+    const renderData = getPageData([pageNumber]);
     setDataSource(renderData);
     setIsLoading(false);
   }, [pageNumber, ingredientType])

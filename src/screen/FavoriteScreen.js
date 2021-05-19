@@ -4,26 +4,30 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import * as StorageHelper from '../helper/StorageHelper';
 import { useMappedState, useDispatch } from 'redux-react-hook';
 import { changeFavoritesCount, addToPrepareCookingList, removeFromPrepareCookingList } from '../redux/action';
+import { useCallback } from 'react';
 
 export default function FavoritesScreen ({navigation}) {
   const [dataSource, setDataSource] = useState([]);
   const [disableArrived, setDisableArrived] = useState('');
+  const [preparedCount, setPreparedCount] = useState(0);  // 用來記錄現在已準備食材數量
+
   const favoritsCountFromStore = useMappedState(state => state.favoritsCount);
-  const prepareCookingList = useMappedState(state => state.prepareCookingList);
+  const prepareIdList = useMappedState(state => state.prepareIdList);
 
   const disPatch = useDispatch();
 
   // 讀取儲存資料
-  const loadStorageData = async () => {
-    // disPatch(changeFavoritesCount(0));
+  const loadStorageData = useCallback(async () => {
     const gotData = await StorageHelper.getJsonArraySetting('favorites');
     if (!gotData) return;
-    const dataLength = gotData.length;
-    console.log(`取得的資料量: ${dataLength}`)
-    console.log(`實際的資料量: ${favoritsCountFromStore}`)
+    // const dataLength = gotData.length;
+    // console.log(`取得的資料量: ${dataLength}`)
+    // console.log(`實際的資料量: ${favoritsCountFromStore}`)
     // 這邊取得的 redux 跟 render 的資料不一樣 todo: 研究 redux map 資料觸發時機
+    const gotPreparedCount = gotData.map((item) => item.prepared === true).length;
+    setPreparedCount(gotPreparedCount);
     setDataSource(gotData);
-  }
+  })
 
   // 前往食材細節
   const goIngredientDetail = (item) => {
@@ -42,18 +46,28 @@ export default function FavoritesScreen ({navigation}) {
   }
 
   // 增加/移除 準備料理 store
-  const preparedCookingListHandler = (item) => {
-    if (prepareCookingList.find((inItem) => inItem.id === item.id)) {
+  const preparedCookingListHandler = async (item) => {
+    if (prepareIdList.find((itemId) => itemId === item.id)) {
       try {
-        disPatch(removeFromPrepareCookingList(item))
-        console.log('移除待煮成功', prepareCookingList.length);
+        await StorageHelper.removeJsonArraySetting('prepared', item);
+        await disPatch(removeFromPrepareCookingList(item.id));
+        setPreparedCount(preparedCount - 1);
+        const newItem = item;
+        newItem.prepared = false;
+        await StorageHelper.patchJsonArraySetting('favorites', item);
+        console.log('移除待煮成功');
       } catch(error) {
         console.log('移除待煮清單失敗', error);
       }
     } else {
       try {
-        disPatch(addToPrepareCookingList(item));
-        console.log('加入待煮成功', prepareCookingList.length);
+        await StorageHelper.setJsonArraySetting('prepared', item);
+        await disPatch(addToPrepareCookingList(item.id));
+        setPreparedCount(preparedCount + 1);
+        const newItem = item;
+        newItem.prepared = true;
+        await StorageHelper.patchJsonArraySetting('favorites', item);
+        console.log('加入待煮成功');
       } catch(error) {
         console.log('加入待煮清單失敗', error);
       }
@@ -69,7 +83,7 @@ export default function FavoritesScreen ({navigation}) {
       <View>
         <View style={styles.mainView}>
           <TouchableOpacity onPress={() => preparedCookingListHandler(item)}>
-            <Ionicons name={ prepareCookingList.find((inItem) => inItem.id === item.id) ? 'ios-checkbox-outline' : 'ios-stop-outline'} size={25} />
+            <Ionicons name={ item.prepared === true ? 'ios-checkbox-outline' : 'ios-stop-outline' } size={25} />
           </TouchableOpacity>
           <View style={{ flex: 1 }}>
             <Text ellipsizeMode='tail' numberOfLines={3} style={{ color: 'black', fontSize: 15, marginTop: 8 }}>
@@ -95,17 +109,22 @@ export default function FavoritesScreen ({navigation}) {
       loadStorageData();
     });
     return refreshFavorites;
-  }, [navigation]);
+  }, [loadStorageData]);
 
   // 當數量有變更的時候渲染資料
   useEffect(() => {
     loadStorageData();
     console.log('執行了 favoritsCount effect');
-  }, [favoritsCountFromStore, prepareCookingList])
+  }, [favoritsCountFromStore, preparedCount])
+
+  // 首次近來讀取資料
+  useEffect(() => {
+    loadStorageData();
+  }, []);
 
   return (
     <View>
-      <Text>favoritsCountFromStore: {favoritsCountFromStore}</Text>
+      <Text>preparedCount: {preparedCount}</Text>
       <TouchableOpacity>
         <Button title='點我更新' onPress={ () => loadStorageData() }></Button>
       </TouchableOpacity>

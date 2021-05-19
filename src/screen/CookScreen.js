@@ -6,12 +6,16 @@ import * as StorageHelper from '../helper/StorageHelper';
 
 import { useMappedState, useDispatch } from 'redux-react-hook';
 import { removeAllPrepareCookingList } from '../redux/action';
+import { useCallback } from 'react';
 
 
 export default function CookScreen ({navigation}) {
   const [recipe, setRecipe] = useState({name: '', ingredient: [], nutrient_content: []});
   const [recipeName, setRecipeName] = useState('');
-  const prepareCookingList = useMappedState(state => state.prepareCookingList);
+
+  const [preparedList, setPreparedList] = useState([]);  // 用來存放得到的已準備食材
+
+  const prepareIdList = useMappedState(state => state.prepareIdList);
   const disPatch = useDispatch();
   
   // 確定是否烹煮 Alert
@@ -26,34 +30,35 @@ export default function CookScreen ({navigation}) {
     )
 
   const cookFunc = () => {
-    let newRecipe = {
-      name: '',
-      ingredient: [],
-      nutrient_content: []
-    }
-    prepareCookingList.forEach((item) => {
-      newRecipe.ingredient.push(item.name);
-      if (!item.nutrient_content) return;  // 如果沒有營養成分便跳過
+    // let newRecipe = {
+    //   name: '',
+    //   ingredient: [],
+    //   nutrient_content: []
+    // }
+    // prepareCookingList.forEach((item) => {
+    //   newRecipe.ingredient.push(item.name);
+    //   if (!item.nutrient_content) return;  // 如果沒有營養成分便跳過
 
-      // 計算所有營養成分 todo: 目前是單份含量而已，還需要增加數目
-      item.nutrient_content.forEach((nutrient_item) => {
-        if (nutrient_item.unit_content <= 0 || nutrient_item.per_content <= 0) return; // 如果營養成分低於 0 不納入計算
-        let exisit_nutrient = newRecipe.nutrient_content.find(exisit_item => exisit_item.name === nutrient_item.name)
-        if (exisit_nutrient) {
-          exisit_nutrient.unit_content += parseFloat(nutrient_item.unit_content);
-        } else {
-          newRecipe.nutrient_content.push({name: nutrient_item.name, unit_content: parseFloat(nutrient_item.unit_content)})
-        }
-      })
-    })
+    //   // 計算所有營養成分 todo: 目前是單份含量而已，還需要增加數目
+    //   item.nutrient_content.forEach((nutrient_item) => {
+    //     if (nutrient_item.unit_content <= 0 || nutrient_item.per_content <= 0) return; // 如果營養成分低於 0 不納入計算
+    //     let exisit_nutrient = newRecipe.nutrient_content.find(exisit_item => exisit_item.name === nutrient_item.name)
+    //     if (exisit_nutrient) {
+    //       exisit_nutrient.unit_content += parseFloat(nutrient_item.unit_content);
+    //     } else {
+    //       newRecipe.nutrient_content.push({name: nutrient_item.name, unit_content: parseFloat(nutrient_item.unit_content)})
+    //     }
+    //   })
+    // })
 
-    // 加入 state
-    setRecipe(newRecipe);
-    console.log(newRecipe.ingredient, newRecipe.nutrient_content.length)
-    console.log('進入烹煮')
-    disPatch(removeAllPrepareCookingList())
+    // // 加入 state
+    // setRecipe(newRecipe);
+    // console.log(newRecipe.ingredient, newRecipe.nutrient_content.length)
+    // console.log('進入烹煮')
+    // disPatch(removeAllPrepareCookingList())
   }
 
+  // 增加食譜
   const addRecipeToStorage = async () => {
     try {
       const oringinRecipe = await StorageHelper.getJsonArraySetting('recipe');
@@ -68,19 +73,43 @@ export default function CookScreen ({navigation}) {
       console.log("加入食譜失敗", error);
     }
   }
+  // 比對兩組陣列的 id 是否都相同，不計較順序
+  const isSameIdForAll = (reduxList, stateList) => {
+    // reduxList 是 id 陣列, stateList 是 物件陣列
+    const resultA = reduxList.every(id => stateList.includes(id));
+    const resultB = stateList.every(item => reduxList.includes(item.id));
+    return resultA && resultB;
+  }
 
-  useEffect(() => {
-    console.log('數量變了', prepareCookingList.length)
-  }, [prepareCookingList])
+  // 同步元件內 state 與 storage 資料
+  const storagePreparedList = useCallback(async () => {
+    console.log(`準備清單長度:${prepareIdList.length},  準備數量: ${preparedList.length}`)
 
+    // 目前 render 的資料與 redux id 陣列不合才繼續
+    if (isSameIdForAll(prepareIdList, preparedList)) return;
+    console.log("食譜更新", prepareIdList.length)
+
+    // 從 Storage 取得資料，並放入要 render 資料
+    const getPrepareListData = await StorageHelper.getJsonArraySetting('prepared');
+    setPreparedList(getPrepareListData);
+  })
+
+  // 首次 render 準備食材清單
   useEffect(() => {
-    console.log("食譜更新")
-  }, [recipe])
+    storagePreparedList();
+  }, [])
+
+  // 每次切換頁面 render 準備食材清單
+  useEffect(() => {
+    const refreshList = navigation.addListener('focus', () => storagePreparedList());
+    return refreshList;
+  }, [storagePreparedList])
 
   return (
     <View style={styles.container}>
-      { prepareCookingList.length ? <Text>目前食材列表:</Text> : <View></View> }
-      { prepareCookingList.length ? prepareCookingList.map((item, index) => <Text>{`${index}: ${item.name}`}</Text>) : <View></View>}
+      <Text>{preparedList.length}</Text>
+      { preparedList.length ? <Text>目前食材列表:</Text> : <View></View> }
+      { preparedList.length ? preparedList.map((item, index) => <Text>{`${index}: ${item.name}`}</Text>) : <View></View>}
       { recipe.ingredient.length > 0 && (
         <View>
           <Text>已新增料理！ 料理名稱: { recipe.name }</Text>

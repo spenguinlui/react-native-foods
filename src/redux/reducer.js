@@ -2,7 +2,7 @@ import { CHANGE_FAVORITES_COUNT, ADD_TO_PREPARECOOKING_LIST, REMOVE_FROM_PREPARE
 
 const initialState = {
   favoritsCount: 0,
-  prepareCookingList: []
+  prepareIdList: []
 }
 
 export default function reducer(state = initialState, action) {
@@ -13,23 +13,23 @@ export default function reducer(state = initialState, action) {
         favoritsCount: action.payload.favoritsCount
       }
     case ADD_TO_PREPARECOOKING_LIST:
-      let addedList = state.prepareCookingList;
+      let addedList = state.prepareIdList;
       addedList.push(action.payload.prepareItem);
       return {
         ...state,
-        prepareCookingList: addedList
+        prepareIdList: addedList
       }
     case REMOVE_FROM_PREPARECOOKING_LIST:
-      let removedList = state.prepareCookingList;
+      let removedList = state.prepareIdList;
       removedList = removedList.filter((item) => item.id !== action.payload.prepareItem.id);
       return {
         ...state,
-        prepareCookingList: removedList
+        prepareIdList: removedList
       }
     case REMOVE_ALL_PREPARECOOKING_LIST:
       return {
         ...state,
-        prepareCookingList: []
+        prepareIdList: []
       }
     default:
       return state
