@@ -1,23 +1,26 @@
 import React from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Button, FlatList } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useEffect, useState } from 'react/cjs/react.development';
 import * as StorageHelper from '../helper/StorageHelper';
 
-export default function RecipeScreen (props) {
-  const [recipeData, setRecipeData] = useState({});
+export default function RecipeScreen ({navigation}) {
+  const [recipeData, setRecipeData] = useState([]);   // 食譜資料
+  const [recipeCount, setRecipeCount] = useState(0);  // 食譜數量
 
+  // todo: 讀取資料會有重複讀取問題, 要用 promise 把更新到 state的動作都包起來
   const loadStorageData = async () => {
     const gotData = await StorageHelper.getJsonArraySetting('recipe');
     setRecipeData(gotData);
-    console.log('得到資料了', gotData)
+    setRecipeCount(gotData.length);
+    console.log('得到資料了')
   }
 
   // 移除食譜
   const removeRecipe = async (item) => {
     await StorageHelper.removeJsonArraySetting('recipe',item );
-    const gotData = await StorageHelper.getJsonArraySetting('recipe');
-    setRecipeData(gotData);
-    console.log('移除該食譜, 新食譜資料:', gotData)
+    setRecipeCount(recipeCount - 1);
+    console.log('移除該食譜');
   }
 
   // 
@@ -33,21 +36,34 @@ export default function RecipeScreen (props) {
           </Text>
         </View>
         <TouchableOpacity>
-          <Button title='>>細節' onPress={() => props.navigation.push('RecipeDetail', { data: item })} />
-          <Button title='-' onPress={() => removeRecipe(item)} />
+          <Button title='>>細節' onPress={() => navigation.push('RecipeDetail', { data: item })} />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => removeRecipe(item)}>
+          <Ionicons name={'ios-trash-outline'} size={25} />
         </TouchableOpacity>
       </View>
       <View style={styles.seperator}/>
     </View>
   )
 
+  // 首次進入畫面讀取資料
   useEffect(() => {
     loadStorageData();
   }, [])
 
+  // 每次切換頁面 render 食譜清單
+  useEffect(() => {
+    const refreshList = navigation.addListener('focus', () => loadStorageData());
+    return refreshList;
+  }, [loadStorageData])
+
+  // 移除食譜時重新渲染資料
+  useEffect(() => {
+    loadStorageData();
+  }, [recipeCount])
+
   return (
     <View>
-      <Button title="點我更新食譜" onPress={ () => loadStorageData() }/>
       <FlatList
         data={recipeData}
         renderItem={({item}) => renderRecipe(item)}

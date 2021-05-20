@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, TouchableOpacity, Button, FlatList } from 'reac
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import * as StorageHelper from '../helper/StorageHelper';
 import { useMappedState, useDispatch } from 'redux-react-hook';
-import { changeFavoritesCount, addToPrepareCookingList, removeFromPrepareCookingList } from '../redux/action';
+import { addToPrepareCookingList, removeFromPrepareCookingList } from '../redux/action';
 import { useCallback } from 'react';
 
 export default function FavoritesScreen ({navigation}) {
@@ -18,14 +18,22 @@ export default function FavoritesScreen ({navigation}) {
 
   // 讀取儲存資料
   const loadStorageData = useCallback(async () => {
-    const gotData = await StorageHelper.getJsonArraySetting('favorites');
+    console.log('發動一次讀取');
+    let gotData = await StorageHelper.getJsonArraySetting('favorites');
     if (!gotData) return;
+
+    // 加工得到資料   -  Ingredient、Cook 會更改到準備食材
+    gotData = gotData.map((item) => {
+      prepareIdList.includes(item.id) ? (item.prepared = true) : (item.prepared = false);
+      return item;
+    });
 
     // 取得資料後要做三件事
     const gotPreparedCount = gotData.map((item) => item.prepared === true).length;
-    setPreparedCount(gotPreparedCount);  // 內部 state 寫入 準備食材數量
-    setFavoritesCount(gotData.length);   // 內部 state 寫入 我的最愛數量
+    if (gotPreparedCount !== preparedCount) setPreparedCount(gotPreparedCount);  // 內部 state 寫入 準備食材數量
+    if (gotData.length !== favoritesCount) setFavoritesCount(gotData.length);   // 內部 state 寫入 我的最愛數量
     setDataSource(gotData);              // 內部 state 寫入 我的最愛資料
+    console.log('發動一次讀取結束')
   })
 
   // 前往食材細節
@@ -50,10 +58,8 @@ export default function FavoritesScreen ({navigation}) {
       try {
         await StorageHelper.removeJsonArraySetting('prepared', item);
         await disPatch(removeFromPrepareCookingList(item.id));
-        setPreparedCount(preparedCount - 1);
-        const newItem = item;
-        newItem.prepared = false;
         await StorageHelper.patchJsonArraySetting('favorites', item);
+        setPreparedCount(preparedCount - 1);
         console.log('移除待煮成功');
       } catch(error) {
         console.log('移除待煮清單失敗', error);
@@ -62,10 +68,8 @@ export default function FavoritesScreen ({navigation}) {
       try {
         await StorageHelper.setJsonArraySetting('prepared', item);
         await disPatch(addToPrepareCookingList(item.id));
-        setPreparedCount(preparedCount + 1);
-        const newItem = item;
-        newItem.prepared = true;
         await StorageHelper.patchJsonArraySetting('favorites', item);
+        setPreparedCount(preparedCount + 1);
         console.log('加入待煮成功');
       } catch(error) {
         console.log('加入待煮清單失敗', error);
@@ -101,15 +105,11 @@ export default function FavoritesScreen ({navigation}) {
     </TouchableOpacity>
   )
 
-  // 首次近來讀取資料
-  useEffect(() => {
-    loadStorageData();
-  }, []);
-
   // 每次切換進來讀取資料 & 讓曾點過細節按鈕可以再點
   useEffect(() => {
     const refreshFavorites = navigation.addListener('focus', () => {
       setDisableArrived('');  // 清空已點擊按鈕
+      console.log("切換進來的讀取")
       loadStorageData();
     });
     return refreshFavorites;
@@ -117,6 +117,7 @@ export default function FavoritesScreen ({navigation}) {
 
   // 當我的最愛移除、勾選準備食材時重新讀取資料渲染
   useEffect(() => {
+    console.log("數量變化的讀取")
     loadStorageData();
   }, [favoritesCount, preparedCount])
 

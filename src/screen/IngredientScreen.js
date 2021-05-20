@@ -8,28 +8,28 @@ import jsonData from '../json/food_data.json';
 import { DEFAULT_FOOD_TYPE, DATA_COUNT_PER_PAGE } from '../setting';
 
 import { useMappedState, useDispatch } from 'redux-react-hook';
-import { changeFavoritesCount, addToPrepareCookingList, removeFromPrepareCookingList } from '../redux/action';
+import { addToPrepareCookingList, removeFromPrepareCookingList } from '../redux/action';
 
 import HeaderList from './component/HeaderList'
 
+// 讀取 JSON/API 資料
+const getPageData = (num, ingredientType) => {
+  const renderData = [];
+  // for (let i = 0; i < DATA_COUNT_PER_PAGE; i++) { renderData.push(jsonData[ingredientType][i + ((num - 1 ) * 10) ]); }
+  for (let i = 0; i < num * DATA_COUNT_PER_PAGE; i++) { renderData.push(jsonData[ingredientType][i]); }
+  return renderData;
+}
+
 export default function IngredientScreen ({navigation}) {
   const [dataSource, setDataSource] = useState([]);
-  const [pageNumber, setPageNumber] = useState(1);
+  const [pageNumber, setPageNumber] = useState(1);       // 往下拉會增加資料
   const [isLoading, setIsLoading] = useState(false);
   const [disableArrived, setDisableArrived] = useState('');
   const [ingredientType, setIngredientType] = useState(DEFAULT_FOOD_TYPE);
   const [preparedCount, setPreparedCount] = useState(0);  // 用來記錄現在已準備食材數量
 
-  const favoritsCountFromStore = useMappedState(state => state.favoritsCount);
   const prepareIdList = useMappedState(state => state.prepareIdList);
   const disPatch = useDispatch();
-
-  // 讀取 JSON/API 資料
-  const getPageData = (num) => {
-    const renderData = [];
-    for (let i = 0; i < num * DATA_COUNT_PER_PAGE; i++) { renderData.push(jsonData[ingredientType][i]); }
-    return renderData;
-  }
 
   // 更新資料
   const refeshData = () => {
@@ -39,6 +39,13 @@ export default function IngredientScreen ({navigation}) {
 
   // 往下拉更新更多資料
   const getNextDataPage = () => setPageNumber(pageNumber + 1);
+
+  // 讀取資料
+  const loadData = () => {
+    const renderData = getPageData(pageNumber, ingredientType);
+    setDataSource(renderData);
+    setIsLoading(false);
+  }
 
   // 前往至食材細節
   const goIngredientDetail = (item) => {
@@ -50,17 +57,12 @@ export default function IngredientScreen ({navigation}) {
   const addToFavorites = async (item) => {
     try {
       const origin_favorites = await StorageHelper.getJsonArraySetting('favorites');
-      const find_data = origin_favorites.find((data) => {
-        return data.id == item.id
-      })
+      const find_data = origin_favorites.find((data) => data.id == item.id)
       if (find_data) {
-        console.log('已經加入過了');
+        alert('已經加入過了');
         return;
       }
       await StorageHelper.setJsonArraySetting('favorites', item);
-      console.log(`更新數量為${favoritsCountFromStore}`);
-      await disPatch(changeFavoritesCount(favoritsCountFromStore + 1));
-      console.log(`更新數量為${favoritsCountFromStore}`);
     } catch(error) {
       console.log('寫入失敗', error);
     }
@@ -118,26 +120,20 @@ export default function IngredientScreen ({navigation}) {
     </TouchableOpacity>
   )
 
-  // 每次進來都要先重設
+  // 每次進來都要復原 關閉細節的按鈕
   useEffect(() => {
-    const resetDisabledButton = navigation.addListener('focus', () => {
-      setDisableArrived('');
-    });
+    const resetDisabledButton = navigation.addListener('focus', () => setDisableArrived(''));
     return resetDisabledButton;
   }, [navigation]);
 
   // 當頁籤 or 食材類型改變時觸發
   useEffect(() => {
     console.log(`現在筆數${pageNumber * 10}`)
-    console.log(`現在 store 為${favoritsCountFromStore}`);
-    const renderData = getPageData([pageNumber]);
-    setDataSource(renderData);
-    setIsLoading(false);
+    loadData();
   }, [pageNumber, ingredientType])
 
   return (
     <View>
-      <Text>我是食材清單, 現在珍藏清單有{favoritsCountFromStore}</Text>
       <FlatList
         data={dataSource}
         ListHeaderComponent={ <HeaderList setIngredientType={setIngredientType} setPageNumber={setPageNumber}></HeaderList> }
@@ -148,7 +144,7 @@ export default function IngredientScreen ({navigation}) {
         )}
         onEndReached={ getNextDataPage }
         onRefresh={ refeshData }
-        onEndReachedThreshold= { 0.01 }
+        onEndReachedThreshold= { 0.0001 }
         refreshing={isLoading}
       />
     </View>

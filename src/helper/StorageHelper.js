@@ -30,6 +30,4 @@ export const patchJsonArraySetting = (key, value) => {
     .then((data) => data.map((current) => (current.id === value.id ? value : current)))
     .then(patchedData => AsyncStorage.setItem(key, JSON.stringify(patchedData)))
 }
-export const resetJsonArraySetting = (key) => {
-  AsyncStorage.setItem(key, JSON.stringify([]))
-}
+export const resetJsonArraySetting = key => AsyncStorage.setItem(key, JSON.stringify([]))

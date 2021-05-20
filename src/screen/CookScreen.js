@@ -8,6 +8,25 @@ import { useMappedState, useDispatch } from 'redux-react-hook';
 import { removeAllPrepareCookingList } from '../redux/action';
 import { useCallback } from 'react';
 
+// 食材合成
+const ingredientMixing = (inputList, outputObj) => {
+  inputList.forEach((item) => {
+    outputObj.ingredient.push(item.name);
+    if (!item.nutrient_content) return;  // 如果沒有營養成分便跳過
+
+    // 計算所有營養成分 todo: 目前是單份含量而已，還需要增加數目
+    item.nutrient_content.forEach((nutrient_item) => {
+      if (nutrient_item.unit_content <= 0 || nutrient_item.per_content <= 0) return; // 如果營養成分低於 0 不納入計算
+      let exisit_nutrient = outputObj.nutrient_content.find(exisit_item => exisit_item.name === nutrient_item.name);
+      if (exisit_nutrient) {
+        exisit_nutrient.unit_content += parseFloat(nutrient_item.unit_content);
+      } else {
+        outputObj.nutrient_content.push({name: nutrient_item.name, unit_content: parseFloat(nutrient_item.unit_content)});
+      }
+    })
+  });
+  return outputObj;
+}
 
 export default function CookScreen ({navigation}) {
   const [recipe, setRecipe] = useState({name: '', ingredient: [], nutrient_content: []});
@@ -29,33 +48,15 @@ export default function CookScreen ({navigation}) {
       ]
     )
 
-  const cookFunc = () => {
-    // let newRecipe = {
-    //   name: '',
-    //   ingredient: [],
-    //   nutrient_content: []
-    // }
-    // prepareCookingList.forEach((item) => {
-    //   newRecipe.ingredient.push(item.name);
-    //   if (!item.nutrient_content) return;  // 如果沒有營養成分便跳過
+  // 烹煮
+  const cookFunc = async () => {
+    const newRecipe = ingredientMixing(preparedList, { name: '', ingredient: [], nutrient_content: [] });
 
-    //   // 計算所有營養成分 todo: 目前是單份含量而已，還需要增加數目
-    //   item.nutrient_content.forEach((nutrient_item) => {
-    //     if (nutrient_item.unit_content <= 0 || nutrient_item.per_content <= 0) return; // 如果營養成分低於 0 不納入計算
-    //     let exisit_nutrient = newRecipe.nutrient_content.find(exisit_item => exisit_item.name === nutrient_item.name)
-    //     if (exisit_nutrient) {
-    //       exisit_nutrient.unit_content += parseFloat(nutrient_item.unit_content);
-    //     } else {
-    //       newRecipe.nutrient_content.push({name: nutrient_item.name, unit_content: parseFloat(nutrient_item.unit_content)})
-    //     }
-    //   })
-    // })
-
-    // // 加入 state
-    // setRecipe(newRecipe);
-    // console.log(newRecipe.ingredient, newRecipe.nutrient_content.length)
-    // console.log('進入烹煮')
-    // disPatch(removeAllPrepareCookingList())
+    // 加入 state
+    setRecipe(newRecipe);   // 加入內部 state 食譜
+    disPatch(removeAllPrepareCookingList());  // 清空 redux 內的準備食材 id列表
+    await StorageHelper.resetJsonArraySetting('prepared'); // 清空 storage 食材清單
+    setPreparedList([]);   // 清空內部 state 準備食材清單
   }
 
   // 增加食譜
@@ -94,11 +95,6 @@ export default function CookScreen ({navigation}) {
     setPreparedList(getPrepareListData);
   })
 
-  // 首次 render 準備食材清單
-  useEffect(() => {
-    storagePreparedList();
-  }, [])
-
   // 每次切換頁面 render 準備食材清單
   useEffect(() => {
     const refreshList = navigation.addListener('focus', () => storagePreparedList());
@@ -107,7 +103,6 @@ export default function CookScreen ({navigation}) {
 
   return (
     <View style={styles.container}>
-      <Text>{preparedList.length}</Text>
       { preparedList.length ? <Text>目前食材列表:</Text> : <View></View> }
       { preparedList.length ? preparedList.map((item, index) => <Text>{`${index}: ${item.name}`}</Text>) : <View></View>}
       { recipe.ingredient.length > 0 && (
@@ -120,7 +115,7 @@ export default function CookScreen ({navigation}) {
           <Button title="加入食譜" onPress={ () => addRecipeToStorage() }/>
         </View>
       )}
-      { 1 ? <Button title="烹煮" onPress={ IsCookAlert }></Button> : <Button title="煮完了" onPress={ IsCookAlert }></Button> }
+      { preparedList.length > 0 ? <Button title="烹煮" onPress={ IsCookAlert }></Button> : <Text>目前沒有預備食材</Text> }
     </View>
   )
 }
