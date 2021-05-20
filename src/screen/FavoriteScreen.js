@@ -9,9 +9,9 @@ import { useCallback } from 'react';
 export default function FavoritesScreen ({navigation}) {
   const [dataSource, setDataSource] = useState([]);
   const [disableArrived, setDisableArrived] = useState('');
-  const [preparedCount, setPreparedCount] = useState(0);  // 用來記錄現在已準備食材數量
+  const [preparedCount, setPreparedCount] = useState(0);    // 用來記錄現在已準備食材數量
+  const [favoritesCount, setFavoritesCount] = useState(0);  // 用來記錄現在我的最愛數量
 
-  const favoritsCountFromStore = useMappedState(state => state.favoritsCount);
   const prepareIdList = useMappedState(state => state.prepareIdList);
 
   const disPatch = useDispatch();
@@ -20,13 +20,12 @@ export default function FavoritesScreen ({navigation}) {
   const loadStorageData = useCallback(async () => {
     const gotData = await StorageHelper.getJsonArraySetting('favorites');
     if (!gotData) return;
-    // const dataLength = gotData.length;
-    // console.log(`取得的資料量: ${dataLength}`)
-    // console.log(`實際的資料量: ${favoritsCountFromStore}`)
-    // 這邊取得的 redux 跟 render 的資料不一樣 todo: 研究 redux map 資料觸發時機
+
+    // 取得資料後要做三件事
     const gotPreparedCount = gotData.map((item) => item.prepared === true).length;
-    setPreparedCount(gotPreparedCount);
-    setDataSource(gotData);
+    setPreparedCount(gotPreparedCount);  // 內部 state 寫入 準備食材數量
+    setFavoritesCount(gotData.length);   // 內部 state 寫入 我的最愛數量
+    setDataSource(gotData);              // 內部 state 寫入 我的最愛資料
   })
 
   // 前往食材細節
@@ -39,7 +38,7 @@ export default function FavoritesScreen ({navigation}) {
   const removeFromFavorites = async (item) => {
     try {
       await StorageHelper.removeJsonArraySetting('favorites', item);
-      await disPatch(changeFavoritesCount(favoritsCountFromStore - 1));
+      setFavoritesCount(favoritesCount - 1);
     } catch(error) {
       console.log('移除失敗', error);
     }
@@ -102,32 +101,27 @@ export default function FavoritesScreen ({navigation}) {
     </TouchableOpacity>
   )
 
-  // 每次進來都要先重設收藏數量
-  useEffect(() => {
-    const refreshFavorites = navigation.addListener('focus', () => {
-      setDisableArrived('');
-      loadStorageData();
-    });
-    return refreshFavorites;
-  }, [loadStorageData]);
-
-  // 當數量有變更的時候渲染資料
-  useEffect(() => {
-    loadStorageData();
-    console.log('執行了 favoritsCount effect');
-  }, [favoritsCountFromStore, preparedCount])
-
   // 首次近來讀取資料
   useEffect(() => {
     loadStorageData();
   }, []);
 
+  // 每次切換進來讀取資料 & 讓曾點過細節按鈕可以再點
+  useEffect(() => {
+    const refreshFavorites = navigation.addListener('focus', () => {
+      setDisableArrived('');  // 清空已點擊按鈕
+      loadStorageData();
+    });
+    return refreshFavorites;
+  }, [loadStorageData]);
+
+  // 當我的最愛移除、勾選準備食材時重新讀取資料渲染
+  useEffect(() => {
+    loadStorageData();
+  }, [favoritesCount, preparedCount])
+
   return (
     <View>
-      <Text>preparedCount: {preparedCount}</Text>
-      <TouchableOpacity>
-        <Button title='點我更新' onPress={ () => loadStorageData() }></Button>
-      </TouchableOpacity>
       <FlatList
         data={dataSource}
         renderItem={({item}) => renderIngredient(item)}
