@@ -1,5 +1,6 @@
 import React from 'react';
 import { Text, View, ScrollView } from 'react-native';
+import styles from '../style/main';
 
 export default function RecipeDetail (props) {
   const data = props.route.params.data || {}

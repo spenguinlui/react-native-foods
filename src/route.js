@@ -29,9 +29,11 @@ function HomeStack () {
     <Stack.Navigator
         initialRouteName='Home'
         screenOptions={{
-          headerStyle: { backgroundColor: 'tomato' },
+          headerStyle: { backgroundColor: '#FFE8E8', shadowOpacity: 0 },
+          headerTitle: '',
           headerBackTitle: '上一頁',
-          headerTintColor: 'white'
+          headerTintColor: '#FF9292',
+          headerTransparent: true
         }}
       >
       <Stack.Screen name="Home" component={ HomeScreen } />
@@ -46,9 +48,10 @@ function IngredientStack () {
     <Stack.Navigator
         initialRouteName='Ingredient'
         screenOptions={{
-          headerStyle: { backgroundColor: 'tomato' },
+          headerStyle: { backgroundColor: '#FFE8E8', shadowOpacity: 0 },
+          headerTitle: '食材清單',
           headerBackTitle: '上一頁',
-          headerTintColor: 'white'
+          headerTintColor: '#FF9292'
         }}
       >
       <Stack.Screen name="Ingredient" component={ IngredientScreen } />
@@ -63,9 +66,10 @@ function FavoriteStack () {
     <Stack.Navigator
         initialRouteName='Favorite'
         screenOptions={{
-          headerStyle: { backgroundColor: 'tomato' },
+          headerStyle: { backgroundColor: '#FFE8E8', shadowOpacity: 0 },
+          headerTitle: '食材收藏櫃',
           headerBackTitle: '上一頁',
-          headerTintColor: 'white'
+          headerTintColor: '#FF9292'
         }}
       >
       <Stack.Screen name="Favorite" component={ FavoriteScreen } />
@@ -83,10 +87,12 @@ function RecipeStack () {
     <Stack.Navigator
         initialRouteName='Recipe'
         screenOptions={ {
-          headerStyle: { backgroundColor: 'tomato' },
+          headerStyle: { backgroundColor: '#FFE8E8', shadowOpacity: 0 },
+          headerTitle: '我的食譜',
           headerBackTitle: '上一頁',
-          headerTintColor: 'white'
+          headerTintColor: '#FF9292'
         } }
+        mode={'modal'}
       >
       <Stack.Screen name="Recipe" component={ RecipeScreen } />
       <Stack.Screen name="RecipeDetail" component={ RecipeDetail } />
@@ -121,12 +127,12 @@ const Router = () => (
               iconName = focused ? 'ios-list' : 'ios-list-outline'
           }
           return (
-            <Ionicons name={iconName} size={25} />
+            <Ionicons name={iconName} size={25} color={ focused ?'#FF9292' : 'gray' } />
           )
         }
       }) }
       tabBarOptions={ {
-        activeTintColor: 'tomato',
+        activeTintColor: '#FF9292',
         inactiveTintColor: 'gray'
       } }
     >

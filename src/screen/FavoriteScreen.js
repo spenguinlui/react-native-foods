@@ -1,10 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Button, FlatList } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
+import { Text, View, TouchableOpacity, FlatList } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import styles from '../style/main';
+
 import * as StorageHelper from '../helper/StorageHelper';
+import { FoodConvertList, IconImage } from '../setting';
+
 import { useMappedState, useDispatch } from 'redux-react-hook';
 import { addToPrepareCookingList, removeFromPrepareCookingList } from '../redux/action';
-import { useCallback } from 'react';
 
 export default function FavoritesScreen ({navigation}) {
   const [dataSource, setDataSource] = useState([]);
@@ -83,24 +86,26 @@ export default function FavoritesScreen ({navigation}) {
       key={item.id}
       disabled={ disableArrived == item.id ? true : false }
     >
-      <View>
-        <View style={styles.mainView}>
-          <TouchableOpacity onPress={() => preparedCookingListHandler(item)}>
-            <Ionicons name={ item.prepared === true ? 'ios-checkbox-outline' : 'ios-stop-outline' } size={25} />
+      <View style={styles.mainList}>
+        <View style={styles.listView}>
+          <TouchableOpacity style={styles.listTypeIcon}>
+            { IconImage(FoodConvertList[item.food_type]() || FoodConvertList['未定義類型']()) }
           </TouchableOpacity>
-          <View style={{ flex: 1 }}>
-            <Text ellipsizeMode='tail' numberOfLines={3} style={{ color: 'black', fontSize: 15, marginTop: 8 }}>
-              { item.id + item.food_type }
+          <View style={styles.listTextBlock}>
+            <Text ellipsizeMode='tail' numberOfLines={3} style={styles.listTitle}>
+              { item.name }
             </Text>
-            <Text ellipsizeMode='tail' numberOfLines={3} style={{ marginTop: 8, fontSize: 13, marginBottom: 8 }}>
-              { item.name }{ item.en_name && ` (${item.en_name})` }
+            <Text ellipsizeMode='tail' numberOfLines={3} style={styles.listDescription}>
+              { item.en_name ? item.en_name : '(no english)' }
             </Text>
           </View>
-          <TouchableOpacity onPress={() => removeFromFavorites(item)}>
+          <TouchableOpacity style={styles.listIcon} onPress={() => preparedCookingListHandler(item)}>
+            <Ionicons name={ item.prepared === true ? 'ios-bookmark' : 'ios-bookmark-outline' } size={25} />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.listIcon} onPress={() => removeFromFavorites(item)}>
             <Ionicons name={'ios-trash-outline'} size={25} />
           </TouchableOpacity>
         </View>
-        <View style={styles.seperator}/>
       </View>
     </TouchableOpacity>
   )
@@ -122,7 +127,7 @@ export default function FavoritesScreen ({navigation}) {
   }, [favoritesCount, preparedCount])
 
   return (
-    <View>
+    <View style={styles.listContainer}>
       <FlatList
         data={dataSource}
         renderItem={({item}) => renderIngredient(item)}
@@ -134,28 +139,3 @@ export default function FavoritesScreen ({navigation}) {
     </View>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  mainView: {
-    height: 80,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'white',
-    padding: 8
-  },
-  seperator: {
-    height: 1,
-    backgroundColor: '#dddddd'
-  },
-  image: {
-    width: 20,
-    height: 40
-  }
-});

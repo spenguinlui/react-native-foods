@@ -1,11 +1,12 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, FlatList } from 'react-native';
+import { Text, View, TouchableOpacity, FlatList } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import styles from '../style/main';
 
 import * as StorageHelper from '../helper/StorageHelper';
 import jsonData from '../json/food_data.json';
-import { DEFAULT_FOOD_TYPE, DATA_COUNT_PER_PAGE } from '../setting';
+import { DEFAULT_FOOD_TYPE, DATA_COUNT_PER_PAGE, IconImage } from '../setting';
 
 import { useMappedState, useDispatch } from 'redux-react-hook';
 import { addToPrepareCookingList, removeFromPrepareCookingList } from '../redux/action';
@@ -92,30 +93,29 @@ export default function IngredientScreen ({navigation}) {
   }
 
   // FlatList 的內容清單's
-  const renderIngredient = (item) => (
+  const renderIngredient = (item,) => (
     <TouchableOpacity
       onPress={ () => goIngredientDetail(item) }
       key={item.id}
       disabled={ disableArrived == item.id ? true : false }
     >
-      <View>
-        <View style={styles.mainView}>
-          <TouchableOpacity onPress={() => preparedCookingListHandler(item)}>
-            <Ionicons name={ prepareIdList.find((itemId) => itemId === item.id) ? 'ios-checkbox-outline' : 'ios-stop-outline'} size={25} />
-          </TouchableOpacity>
-          <View style={{ flex: 1 }}>
-            <Text ellipsizeMode='tail' numberOfLines={3} style={{ color: 'black', fontSize: 15, marginTop: 8 }}>
-              { item.id + item.food_type }
+      <View style={styles.mainList}>
+        <View style={styles.listView}>
+          <View style={styles.listTextBlock}>
+            <Text ellipsizeMode='tail' numberOfLines={3} style={styles.listTitle}>
+              { item.name }
             </Text>
-            <Text ellipsizeMode='tail' numberOfLines={3} style={{ marginTop: 8, fontSize: 13, marginBottom: 8 }}>
-              { item.name }{ item.en_name && ` (${item.en_name})` }
+            <Text ellipsizeMode='tail' numberOfLines={3} style={styles.listDescription}>
+              { item.en_name ? item.en_name : '(no english)' }
             </Text>
           </View>
-          <TouchableOpacity onPress={() => addToFavorites(item)}>
+          <TouchableOpacity style={styles.listIcon} onPress={() => preparedCookingListHandler(item)}>
+            <Ionicons name={ prepareIdList.find((itemId) => itemId === item.id) ? 'ios-bookmark' : 'ios-bookmark-outline'} size={25} />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.listIcon} onPress={() => addToFavorites(item)}>
             <Ionicons name={'ios-add-circle-outline'} size={20} />
           </TouchableOpacity>
         </View>
-        <View style={styles.seperator}/>
       </View>
     </TouchableOpacity>
   )
@@ -133,7 +133,7 @@ export default function IngredientScreen ({navigation}) {
   }, [pageNumber, ingredientType])
 
   return (
-    <View>
+    <View style={styles.listContainer}>
       <FlatList
         data={dataSource}
         ListHeaderComponent={ <HeaderList setIngredientType={setIngredientType} setPageNumber={setPageNumber}></HeaderList> }
@@ -150,37 +150,3 @@ export default function IngredientScreen ({navigation}) {
     </View>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  header: {
-    height: 40,
-    flexDirection: 'row',
-  },
-  mainView: {
-    height: 80,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'white',
-    padding: 8
-  },
-  seperator: {
-    height: 1,
-    backgroundColor: '#dddddd'
-  },
-  image: {
-    width: 40,
-    height: 40,
-  },
-  activeImage: {
-    width: 40,
-    height: 40,
-    backgroundColor: "#000"
-  }
-});

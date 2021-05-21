@@ -1,6 +1,8 @@
 import React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Button, FlatList } from 'react-native';
+import { Text, View, TouchableOpacity, FlatList } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import styles from '../style/main';
+
 import { useEffect, useState } from 'react/cjs/react.development';
 import * as StorageHelper from '../helper/StorageHelper';
 
@@ -25,25 +27,21 @@ export default function RecipeScreen ({navigation}) {
 
   // 
   const renderRecipe = (item) => (
-    <View>
-      <View style={styles.mainView}>
-        <View style={{ flex: 1 }}>
-          <Text ellipsizeMode='tail' numberOfLines={3} style={{ color: 'black', fontSize: 15, marginTop: 8 }}>
-            食譜名稱: { item.name }
+    <TouchableOpacity style={styles.mainList} onPress={() => navigation.push('RecipeDetail', { data: item })}>
+      <View style={styles.listView}>
+        <View style={styles.listTextBlock}>
+          <Text ellipsizeMode='tail' numberOfLines={3} style={styles.listTitle}>
+            { item.name }
           </Text>
-          <Text ellipsizeMode='tail' numberOfLines={3} style={{ marginTop: 8, fontSize: 13, marginBottom: 8 }}>
+          <Text ellipsizeMode='tail' numberOfLines={3} style={styles.listDescription}>
             材料: { item.ingredient.map((name) => `${name} .`) }
           </Text>
         </View>
-        <TouchableOpacity>
-          <Button title='>>細節' onPress={() => navigation.push('RecipeDetail', { data: item })} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => removeRecipe(item)}>
+        <TouchableOpacity style={styles.listIcon} onPress={() => removeRecipe(item)}>
           <Ionicons name={'ios-trash-outline'} size={25} />
         </TouchableOpacity>
       </View>
-      <View style={styles.seperator}/>
-    </View>
+    </TouchableOpacity>
   )
 
   // 首次進入畫面讀取資料
@@ -63,7 +61,7 @@ export default function RecipeScreen ({navigation}) {
   }, [recipeCount])
 
   return (
-    <View>
+    <View style={styles.listContainer}>
       <FlatList
         data={recipeData}
         renderItem={({item}) => renderRecipe(item)}
@@ -75,28 +73,3 @@ export default function RecipeScreen ({navigation}) {
     </View>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  mainView: {
-    height: 80,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'white',
-    padding: 8
-  },
-  seperator: {
-    height: 1,
-    backgroundColor: '#dddddd'
-  },
-  image: {
-    width: 20,
-    height: 40
-  }
-});

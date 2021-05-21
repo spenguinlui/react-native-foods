@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
-import { StyleSheet, Text, View, Alert, TouchableOpacity, Button, ScrollView, TextInput } from 'react-native';
+import { Text, View, Alert, Button, TextInput } from 'react-native';
 import { useState } from 'react/cjs/react.development';
+import styles from '../style/main';
 
 import * as StorageHelper from '../helper/StorageHelper';
 
@@ -115,22 +116,7 @@ export default function CookScreen ({navigation}) {
           <Button title="加入食譜" onPress={ () => addRecipeToStorage() }/>
         </View>
       )}
-      { preparedList.length > 0 ? <Button title="烹煮" onPress={ IsCookAlert }></Button> : <Text>目前沒有預備食材</Text> }
+      { preparedList.length > 0 ? <Button title="烹煮" style={styles.mainButton} onPress={ IsCookAlert }></Button> : <Text>目前沒有預備食材</Text> }
     </View>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  input: {
-    borderColor: '#DDD',
-    borderWidth: 2,
-    width: 200,
-    height: 40
-  }
-});
