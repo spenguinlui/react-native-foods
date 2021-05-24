@@ -6,7 +6,7 @@ import styles from '../style/main';
 
 import * as StorageHelper from '../helper/StorageHelper';
 import jsonData from '../json/food_data.json';
-import { DEFAULT_FOOD_TYPE, DATA_COUNT_PER_PAGE, IconImage } from '../setting';
+import { DEFAULT_FOOD_TYPE, DATA_COUNT_PER_PAGE, IconImage, FoodConvertList } from '../setting';
 
 import { useMappedState, useDispatch } from 'redux-react-hook';
 import { addToPrepareCookingList, removeFromPrepareCookingList } from '../redux/action';
@@ -64,6 +64,7 @@ export default function IngredientScreen ({navigation}) {
         return;
       }
       await StorageHelper.setJsonArraySetting('favorites', item);
+      alert('食材收藏！')
     } catch(error) {
       console.log('寫入失敗', error);
     }
@@ -101,11 +102,14 @@ export default function IngredientScreen ({navigation}) {
     >
       <View style={styles.mainList}>
         <View style={styles.listView}>
+          <TouchableOpacity style={styles.listTypeIcon}>
+            { IconImage(FoodConvertList[item.food_type]() || FoodConvertList['未定義類型']()) }
+          </TouchableOpacity>
           <View style={styles.listTextBlock}>
-            <Text ellipsizeMode='tail' numberOfLines={3} style={styles.listTitle}>
+            <Text ellipsizeMode='tail' numberOfLines={1} style={styles.listTitle}>
               { item.name }
             </Text>
-            <Text ellipsizeMode='tail' numberOfLines={3} style={styles.listDescription}>
+            <Text ellipsizeMode='tail' numberOfLines={1} style={styles.listDescription}>
               { item.en_name ? item.en_name : '(no english)' }
             </Text>
           </View>
@@ -134,9 +138,9 @@ export default function IngredientScreen ({navigation}) {
 
   return (
     <View style={styles.listContainer}>
+      <HeaderList setIngredientType={setIngredientType} setPageNumber={setPageNumber}></HeaderList>
       <FlatList
         data={dataSource}
-        ListHeaderComponent={ <HeaderList setIngredientType={setIngredientType} setPageNumber={setPageNumber}></HeaderList> }
         renderItem={({item}) => renderIngredient(item)}
         keyExtractor={(item) => item.id}
         getItemLayout={(data, index) => (

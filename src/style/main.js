@@ -1,9 +1,5 @@
 import { StyleSheet } from 'react-native';
-
-const MAIN_COLOR = "#FF9292";
-const MAIN_COLOR_2 = "#FFB4B4";
-const SECONDARY_COLOR = "#FFDCDC";
-const BACKGROUND_COLOR = "#FFE8E8";
+import { MAIN_COLOR, MAIN_COLOR_2, SECONDARY_COLOR, BACKGROUND_COLOR } from '../setting';
 
 export default StyleSheet.create({
   container: {
@@ -64,8 +60,21 @@ export default StyleSheet.create({
     textAlignVertical: "center"
   },
   header: {
-    height: 40,
-    flexDirection: 'row',
+    height: 70,
+    paddingLeft: 10,
+    marginVertical: 10,
+  },
+  headerIcon: {
+    marginRight: 10,
+    padding: 5,
+    backgroundColor: 'white',
+    borderRadius: 50
+  },
+  headerActiveIcon: {
+    marginRight: 10,
+    padding: 10,
+    backgroundColor: MAIN_COLOR_2,
+    borderRadius: 50
   },
   seperator: {
     height: 1,
@@ -73,12 +82,11 @@ export default StyleSheet.create({
   },
   image: {
     width: 40,
-    height: 40
+    height: 40,
   },
   activeImage: {
-    width: 40,
-    height: 40,
-    backgroundColor: "#000"
+    width: 45,
+    height: 45,
   },
   input: {
     borderColor: '#DDD',

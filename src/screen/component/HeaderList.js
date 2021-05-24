@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState } from 'react';
-import { Text, Image, View, ScrollView, TouchableOpacity } from 'react-native';
+import { View, ScrollView, TouchableOpacity } from 'react-native';
 import styles from '../../style/main';
 
 import jsonData from '../../json/food_data.json';
@@ -24,24 +24,26 @@ const HeaderList = (props) => {
     <View>
       <ScrollView
         style={styles.header}
-        horizontal={true}
+        horizontal={ true }
+        contentContainerStyle={{ alignItems: 'center' }}
       >
       { headerArray.map((title) => {
         if (title === 'undefined') return;  // 按下去會掛掉 todo: 待修正
         return (
           <TouchableOpacity key={title} onPress={ () => changeIngredientType(title) }>
-            <View>
+            <View style={ activeIcon === title ? styles.headerActiveIcon : styles.headerIcon } >
               { IconImage(title, activeIcon) }
             </View>
           </TouchableOpacity>
         )
       }) }
       </ScrollView>
-      <View>
-        <Text>現在食材類型是: { foodTypeToZhTw(activeIcon) }</Text>
-      </View>
     </View>
   )
 }
 
 export default HeaderList;
+
+// <View>
+//         <Text>現在食材類型是: { foodTypeToZhTw(activeIcon) }</Text>
+//       </View>

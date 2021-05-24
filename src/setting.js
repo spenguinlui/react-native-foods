@@ -1,6 +1,12 @@
 import React from 'react';
 import { Image } from 'react-native';
-import styles from './style/main'
+import styles from './style/main';
+
+// 主色系
+export const MAIN_COLOR = "#FC7676";
+export const MAIN_COLOR_2 = "#FF9292";
+export const SECONDARY_COLOR = "#FFDCDC";
+export const BACKGROUND_COLOR = "#FFE8E8";
 
 // 預設食材類型
 export const DEFAULT_FOOD_TYPE = 'seafoods';
@@ -36,7 +42,7 @@ export const FoodConvertList = {
   '豆類': () => 'legume',
   '乳品類': () => 'milk',
   '油脂類': () => 'fat',
-  '堅果類': () => 'nut',
+  '堅果及種子類': () => 'nut',
   '蛋類': () => 'egg',
   '魚貝類': () => 'seafoods',
   '菇類': () => 'mushroom',

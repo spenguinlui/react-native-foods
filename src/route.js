@@ -6,6 +6,8 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
+import { MAIN_COLOR, BACKGROUND_COLOR } from './setting'
+
 // 元件
 import HomeScreen from './screen/HomeScreen'
 import InstructionScreen from './screen/InstructionScreen'
@@ -29,10 +31,10 @@ function HomeStack () {
     <Stack.Navigator
         initialRouteName='Home'
         screenOptions={{
-          headerStyle: { backgroundColor: '#FFE8E8', shadowOpacity: 0 },
+          headerStyle: { backgroundColor: BACKGROUND_COLOR, shadowOpacity: 0 },
           headerTitle: '',
           headerBackTitle: '上一頁',
-          headerTintColor: '#FF9292',
+          headerTintColor: MAIN_COLOR,
           headerTransparent: true
         }}
       >
@@ -48,10 +50,10 @@ function IngredientStack () {
     <Stack.Navigator
         initialRouteName='Ingredient'
         screenOptions={{
-          headerStyle: { backgroundColor: '#FFE8E8', shadowOpacity: 0 },
+          headerStyle: { backgroundColor: BACKGROUND_COLOR, shadowOpacity: 0 },
           headerTitle: '食材清單',
           headerBackTitle: '上一頁',
-          headerTintColor: '#FF9292'
+          headerTintColor: MAIN_COLOR
         }}
       >
       <Stack.Screen name="Ingredient" component={ IngredientScreen } />
@@ -66,10 +68,10 @@ function FavoriteStack () {
     <Stack.Navigator
         initialRouteName='Favorite'
         screenOptions={{
-          headerStyle: { backgroundColor: '#FFE8E8', shadowOpacity: 0 },
+          headerStyle: { backgroundColor: BACKGROUND_COLOR, shadowOpacity: 0 },
           headerTitle: '食材收藏櫃',
           headerBackTitle: '上一頁',
-          headerTintColor: '#FF9292'
+          headerTintColor: MAIN_COLOR
         }}
       >
       <Stack.Screen name="Favorite" component={ FavoriteScreen } />
@@ -87,10 +89,10 @@ function RecipeStack () {
     <Stack.Navigator
         initialRouteName='Recipe'
         screenOptions={ {
-          headerStyle: { backgroundColor: '#FFE8E8', shadowOpacity: 0 },
+          headerStyle: { backgroundColor: BACKGROUND_COLOR, shadowOpacity: 0 },
           headerTitle: '我的食譜',
           headerBackTitle: '上一頁',
-          headerTintColor: '#FF9292'
+          headerTintColor: MAIN_COLOR
         } }
         mode={'modal'}
       >
@@ -108,39 +110,39 @@ const Router = () => (
         tabBarIcon: ({color, focused}) => {
           let iconName = '';
           switch (route.name) {
-            case 'Home':
+            case '首頁':
               iconName = focused ? 'ios-home' : 'ios-home-outline';
               break;
-            case 'Ingredient':
+            case '食材':
               iconName = focused ? 'ios-fast-food' : 'ios-fast-food-outline';
               break;
-            case 'Favorite':
+            case '食材收藏':
               iconName = focused ? 'ios-heart' : 'ios-heart-outline';
               break;
-            case 'Cook':
+            case '料理':
               iconName = focused ? 'ios-restaurant' : 'ios-restaurant-outline';
               break;
-            case 'Recipe':
+            case '食譜':
               iconName = focused ? 'ios-book' : 'ios-book-outline';
               break;
             default:
               iconName = focused ? 'ios-list' : 'ios-list-outline'
           }
           return (
-            <Ionicons name={iconName} size={25} color={ focused ?'#FF9292' : 'gray' } />
+            <Ionicons name={iconName} size={25} color={ focused ?MAIN_COLOR : 'gray' } />
           )
         }
       }) }
       tabBarOptions={ {
-        activeTintColor: '#FF9292',
+        activeTintColor: MAIN_COLOR,
         inactiveTintColor: 'gray'
       } }
     >
-      <Tab.Screen name="Home" component={ HomeStack } />
-      <Tab.Screen name="Ingredient" component={ IngredientStack } />
-      <Tab.Screen name="Cook" component={ CookScreen } />
-      <Tab.Screen name="Favorite" component={ FavoriteStack } />
-      <Tab.Screen name="Recipe" component={ RecipeStack } />
+      <Tab.Screen name="首頁" component={ HomeStack } />
+      <Tab.Screen name="食材" component={ IngredientStack } />
+      <Tab.Screen name="料理" component={ CookScreen } />
+      <Tab.Screen name="食材收藏" component={ FavoriteStack } />
+      <Tab.Screen name="食譜" component={ RecipeStack } />
     </Tab.Navigator>
   </NavigationContainer>
 )
