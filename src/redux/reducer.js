@@ -15,7 +15,7 @@ export default function reducer(state = initialState, action) {
       }
     case REMOVE_FROM_PREPARECOOKING_LIST:
       let removedList = state.prepareIdList;
-      removedList = removedList.filter((item) => item.id !== action.payload.prepareItem.id);
+      removedList = removedList.filter((item) => item !== action.payload.prepareItem);
       return {
         ...state,
         prepareIdList: removedList

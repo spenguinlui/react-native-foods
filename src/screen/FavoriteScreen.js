@@ -21,7 +21,7 @@ export default function FavoritesScreen ({navigation}) {
 
   // 讀取儲存資料
   const loadStorageData = useCallback(async () => {
-    console.log('發動一次讀取');
+    // console.log('發動一次讀取');
     let gotData = await StorageHelper.getJsonArraySetting('favorites');
     if (!gotData) return;
 
@@ -36,7 +36,7 @@ export default function FavoritesScreen ({navigation}) {
     if (gotPreparedCount !== preparedCount) setPreparedCount(gotPreparedCount);  // 內部 state 寫入 準備食材數量
     if (gotData.length !== favoritesCount) setFavoritesCount(gotData.length);   // 內部 state 寫入 我的最愛數量
     setDataSource(gotData);              // 內部 state 寫入 我的最愛資料
-    console.log('發動一次讀取結束')
+    // console.log('發動一次讀取結束')
   })
 
   // 前往食材細節
@@ -122,7 +122,7 @@ export default function FavoritesScreen ({navigation}) {
 
   // 當我的最愛移除、勾選準備食材時重新讀取資料渲染
   useEffect(() => {
-    console.log("數量變化的讀取")
+    // console.log("數量變化的讀取")
     loadStorageData();
   }, [favoritesCount, preparedCount])
 

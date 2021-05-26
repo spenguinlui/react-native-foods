@@ -1,13 +1,14 @@
-import React, { useEffect } from 'react';
-import { Text, View, Alert, Button, TextInput } from 'react-native';
-import { useState } from 'react/cjs/react.development';
-import styles from '../style/main';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Text, View, Alert, Button, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import common from '../style/main';
+import { MAIN_COLOR, MAIN_COLOR_2, SECONDARY_COLOR, BACKGROUND_COLOR } from '../setting'
 
 import * as StorageHelper from '../helper/StorageHelper';
 
 import { useMappedState, useDispatch } from 'redux-react-hook';
 import { removeAllPrepareCookingList } from '../redux/action';
-import { useCallback } from 'react';
+
+import PreparedListBoard from './component/PreparedListBoard'
 
 // 食材合成
 const ingredientMixing = (inputList, outputObj) => {
@@ -20,9 +21,9 @@ const ingredientMixing = (inputList, outputObj) => {
       if (nutrient_item.unit_content <= 0 || nutrient_item.per_content <= 0) return; // 如果營養成分低於 0 不納入計算
       let exisit_nutrient = outputObj.nutrient_content.find(exisit_item => exisit_item.name === nutrient_item.name);
       if (exisit_nutrient) {
-        exisit_nutrient.unit_content += parseFloat(nutrient_item.unit_content);
+        exisit_nutrient.unit_content += (parseFloat(nutrient_item.unit_content) * (item.count || 1));
       } else {
-        outputObj.nutrient_content.push({name: nutrient_item.name, unit_content: parseFloat(nutrient_item.unit_content)});
+        outputObj.nutrient_content.push({name: nutrient_item.name, unit_content: (parseFloat(nutrient_item.unit_content) * (item.count || 1))});
       }
     })
   });
@@ -34,6 +35,7 @@ export default function CookScreen ({navigation}) {
   const [recipeName, setRecipeName] = useState('');
 
   const [preparedList, setPreparedList] = useState([]);  // 用來存放得到的已準備食材
+  const [listCountIsChange, setListCountIsChange] = useState(false)
 
   const prepareIdList = useMappedState(state => state.prepareIdList);
   const disPatch = useDispatch();
@@ -60,12 +62,20 @@ export default function CookScreen ({navigation}) {
     setPreparedList([]);   // 清空內部 state 準備食材清單
   }
 
+  // 食譜命名同步
+  const syncrecipeName = (name) => {
+    setRecipeName(name);
+    setRecipe({...recipe, name: recipeName});
+  }
+
   // 增加食譜
   const addRecipeToStorage = async () => {
     try {
       const oringinRecipe = await StorageHelper.getJsonArraySetting('recipe');
+      console.log(recipeName)
+      if (!recipe.name) return;
       if (oringinRecipe.find((item) => item.name === recipe.name)) {
-        console.log("食譜撞名囉！");
+        alert("食譜撞名囉！");
         return;
       }
       StorageHelper.setJsonArraySetting('recipe', recipe);
@@ -102,21 +112,77 @@ export default function CookScreen ({navigation}) {
     return refreshList;
   }, [storagePreparedList])
 
+  // 監聽某項目內的數量被改變就重新 render
+  useEffect(() => {
+    setListCountIsChange(false);
+  }, [listCountIsChange])
+
   return (
-    <View style={styles.container}>
-      { preparedList.length ? <Text>目前食材列表:</Text> : <View></View> }
-      { preparedList.length ? preparedList.map((item, index) => <Text>{`${index}: ${item.name}`}</Text>) : <View></View>}
+    <View style={common.container}>
       { recipe.ingredient.length > 0 && (
-        <View>
-          <Text>已新增料理！ 料理名稱: { recipe.name }</Text>
-          { recipe.ingredient.map((ingredientName) => <Text>{ ingredientName }</Text>) }
-          <Text>營養成分種類: { recipe.nutrient_content.length }</Text>
-          <TextInput style={styles.input} onChangeText={setRecipeName} value={recipeName}></TextInput>
-          <Button title="命名食譜" onPress={ () => setRecipe({...recipe, name: recipeName}) }/>
-          <Button title="加入食譜" onPress={ () => addRecipeToStorage() }/>
+        <View style={ styles.board }>
+          <View><Text style={ styles.title }>料理完成</Text></View>
+          <TextInput style={styles.input} onChangeText={ (name) => syncrecipeName(name)} value={recipeName}></TextInput>
+          <View style={ styles.buttonBlock}>
+            { recipeName.length <= 0 ? 
+            <Text style={styles.text}>取個名字吧！</Text>
+            : <TouchableOpacity style={common.mainButton} onPress={ () => addRecipeToStorage() }>
+              <Text style={common.text}>保留食譜</Text>
+            </TouchableOpacity> 
+            }
+          </View>
         </View>
       )}
-      { preparedList.length > 0 ? <Button title="烹煮" style={styles.mainButton} onPress={ IsCookAlert }></Button> : <Text>目前沒有預備食材</Text> }
+      { preparedList.length ? <PreparedListBoard list={preparedList} setListCountIsChange={setListCountIsChange}/> : <View/> }
+      <View style={{ marginTop: 40 }}>
+        { preparedList.length ?
+          <TouchableOpacity style={common.mainButton} onPress={ IsCookAlert }>
+            <Text style={common.text}>開始料理</Text>
+          </TouchableOpacity>
+          : <View/>
+        }
+      </View>
+      <Text style={ styles.onlyText }>{ preparedList.length === 0 && recipe.ingredient.length === 0 ? '請先挑選食材' : '' }</Text>
     </View>
   )
 }
+
+const styles =  StyleSheet.create({
+  board: {
+    padding: 20,
+    height: 200,
+    backgroundColor: 'white',
+    borderRadius: 20,
+  },
+  title: {
+    color: SECONDARY_COLOR,
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center'
+  },
+  input: {
+    marginTop: 10,
+    borderBottomWidth: 2,
+    borderColor: '#DDD',
+    width: 200,
+    height: 40,
+    textAlign: 'center',
+    color: '#333333',
+    fontSize: 20,
+  },
+  text: {
+    fontSize: 18,
+    color: '#555555',
+    textAlign: 'center',
+    paddingTop: 15
+  },
+  buttonBlock: {
+    marginTop: 20
+  },
+  onlyText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#555555',
+  }
+})

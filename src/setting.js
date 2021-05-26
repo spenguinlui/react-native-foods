@@ -5,7 +5,7 @@ import styles from './style/image';
 // 主色系
 export const MAIN_COLOR = "#FC7676";
 export const MAIN_COLOR_2 = "#FF9292";
-export const SECONDARY_COLOR = "#FFDCDC";
+export const SECONDARY_COLOR = "#99154E";
 export const BACKGROUND_COLOR = "#FFE8E8";
 
 // 預設食材類型
@@ -13,6 +13,9 @@ export const DEFAULT_FOOD_TYPE = 'seafoods';
 
 // 預設每頁資料量
 export const DATA_COUNT_PER_PAGE = 10;
+
+// 單件準備食材最高使用量
+export const MAX_PREPARED_COUNT = 50;
 
 // 食材類型中英文置換列表
 // use: () => FoodConvertList[title]() || FoodConvertList['default']()

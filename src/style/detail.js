@@ -36,7 +36,7 @@ export default StyleSheet.create({
     marginRight: 20,
   },
   name: {
-    color: '#99154e',
+    color: SECONDARY_COLOR,
     fontSize: 30,
   },
   enNameBlock: {
