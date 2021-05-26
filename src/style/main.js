@@ -80,14 +80,6 @@ export default StyleSheet.create({
     height: 1,
     backgroundColor: '#dddddd'
   },
-  image: {
-    width: 40,
-    height: 40,
-  },
-  activeImage: {
-    width: 45,
-    height: 45,
-  },
   input: {
     borderColor: '#DDD',
     borderWidth: 2,

@@ -49,12 +49,15 @@ function IngredientStack () {
   return (
     <Stack.Navigator
         initialRouteName='Ingredient'
-        screenOptions={{
-          headerStyle: { backgroundColor: BACKGROUND_COLOR, shadowOpacity: 0 },
-          headerTitle: '食材清單',
-          headerBackTitle: '上一頁',
-          headerTintColor: MAIN_COLOR
-        }}
+        screenOptions={({route}) => (
+          {
+            headerStyle: { backgroundColor: BACKGROUND_COLOR, shadowOpacity: 0 },
+            headerTitle: route.name === 'IngredientDetail' ? '' : '食材清單',
+            headerBackTitle: '上一頁',
+            headerTintColor: MAIN_COLOR,
+            headerTransparent: route.name === 'IngredientDetail' ? true : false
+          }
+        )}
       >
       <Stack.Screen name="Ingredient" component={ IngredientScreen } />
       <Stack.Screen name="IngredientDetail" component={ IngredientDetail } />
@@ -67,12 +70,15 @@ function FavoriteStack () {
   return (
     <Stack.Navigator
         initialRouteName='Favorite'
-        screenOptions={{
-          headerStyle: { backgroundColor: BACKGROUND_COLOR, shadowOpacity: 0 },
-          headerTitle: '食材收藏櫃',
-          headerBackTitle: '上一頁',
-          headerTintColor: MAIN_COLOR
-        }}
+        screenOptions={({route}) => (
+          {
+            headerStyle: { backgroundColor: BACKGROUND_COLOR, shadowOpacity: 0 },
+            headerTitle: route.name === 'IngredientDetail' ? '' : '食材收藏櫃',
+            headerBackTitle: '上一頁',
+            headerTintColor: MAIN_COLOR,
+            headerTransparent: route.name === 'IngredientDetail' ? true : false
+          }
+        )}
       >
       <Stack.Screen name="Favorite" component={ FavoriteScreen } />
       <Stack.Screen name="IngredientDetail" component={ IngredientDetail } />
@@ -105,7 +111,7 @@ function RecipeStack () {
 const Router = () => (
   <NavigationContainer>
     <Tab.Navigator
-      initialRouteName='Home'
+      initialRouteName='首頁'
       screenOptions={ ({route}) => ({
         tabBarIcon: ({color, focused}) => {
           let iconName = '';

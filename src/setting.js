@@ -1,6 +1,6 @@
 import React from 'react';
 import { Image } from 'react-native';
-import styles from './style/main';
+import styles from './style/image';
 
 // 主色系
 export const MAIN_COLOR = "#FC7676";
@@ -57,7 +57,7 @@ export const FoodConvertList = {
   '未定義類型': () => 'default'
 }
 
-// 食物圖片元件列表
+// 食物 icon 元件列表
 export const IconImage = (title, activeIcon) => {
   const IconImageList =  {
     'fruit': () => <Image style={title === activeIcon ? styles.activeImage : styles.image} source={require('./images/fruit.png')}/>,
@@ -79,6 +79,32 @@ export const IconImage = (title, activeIcon) => {
     'sugar': () => <Image style={title === activeIcon ? styles.activeImage : styles.image} source={require('./images/sugar.png')}/>,
     'alga': () => <Image style={title === activeIcon ? styles.activeImage : styles.image} source={require('./images/alga.png')}/>,
     'default': () => <Image style={title === activeIcon ? styles.activeImage : styles.image} source={require('./images/undefined.png')}/>
+  };
+  return IconImageList[title]() || IconImageList['default']();
+}
+
+// 食物大圖元件列表
+export const bgImage = (title) => {
+  const IconImageList =  {
+    'fruit': () => <Image style={styles.bgImage} source={require('./images/fruit.png')}/>,
+    'prepared_and_other': () => <Image style={styles.bgImage} source={require('./images/prepared_and_other.png')}/>,
+    'meat': () => <Image style={styles.bgImage} source={require('./images/meat.png')}/>,
+    'legume': () => <Image style={styles.bgImage} source={require('./images/legume.png')}/>,
+    'milk': () => <Image style={styles.bgImage} source={require('./images/milk.png')}/>,
+    'fat': () => <Image style={styles.bgImage} source={require('./images/fat.png')}/>,
+    'nut': () => <Image style={styles.bgImage} source={require('./images/nut.png')}/>,
+    'egg': () => <Image style={styles.bgImage} source={require('./images/egg.png')}/>,
+    'seafoods': () => <Image style={styles.bgImage} source={require('./images/seafoods.png')}/>,
+    'mushroom': () => <Image style={styles.bgImage} source={require('./images/mushroom.png')}/>,
+    'drink': () => <Image style={styles.bgImage} source={require('./images/drink.png')}/>,
+    'grains': () => <Image style={styles.bgImage} source={require('./images/grains.png')}/>,
+    'vegetable': () => <Image style={styles.bgImage} source={require('./images/vegetable.png')}/>,
+    'seasoning': () => <Image style={styles.bgImage} source={require('./images/seasoning.png')}/>,
+    'starch': () => <Image style={styles.bgImage} source={require('./images/starch.png')}/>,
+    'pastry': () => <Image style={styles.bgImage} source={require('./images/pastry.png')}/>,
+    'sugar': () => <Image style={styles.bgImage} source={require('./images/sugar.png')}/>,
+    'alga': () => <Image style={styles.bgImage} source={require('./images/alga.png')}/>,
+    'default': () => <Image style={styles.bgImage} source={require('./images/undefined.png')}/>
   };
   return IconImageList[title]() || IconImageList['default']();
 }
