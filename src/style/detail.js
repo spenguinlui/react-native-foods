@@ -23,14 +23,14 @@ export default StyleSheet.create({
     backgroundColor: BACKGROUND_COLOR,
   },
   topContent: {
-    marginTop: 120,
+    marginTop: 80,
     marginBottom: 10,
     display: 'flex',
     flexDirection: 'row'
   },
   nameBlock: {
-    minWidth: 200,
-    maxWidth: 230,
+    minWidth: windowWidth / 2.5,
+    maxWidth: windowWidth / 2,
     marginLeft: 50,
     marginRight: 20,
   },
@@ -39,11 +39,12 @@ export default StyleSheet.create({
     fontSize: 30,
   },
   enNameBlock: {
+    minWidth: windowWidth / 2.5,
+    maxWidth: windowWidth / 2,
     marginLeft: 50,
     marginRight: 20,
-    marginVertical: 20,
-    minWidth: 200,
-    maxWidth: 230,
+    marginTop: 20,
+    marginBottom: 10
   },
   enName: {
     paddingLeft: 15,
@@ -51,7 +52,7 @@ export default StyleSheet.create({
   },
   descriptionBlock: {
     marginHorizontal: 30,
-    marginVertical: 20
+    marginVertical: 10
   },
   description: {
     color: 'gray',
@@ -104,6 +105,7 @@ export default StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',
+    flexWrap: 'wrap'
   },
   nutrientListText: {
     display: 'flex',

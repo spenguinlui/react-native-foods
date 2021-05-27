@@ -92,10 +92,10 @@ export default function FavoritesScreen ({navigation}) {
             { IconImage(FoodConvertList[item.food_type]() || FoodConvertList['未定義類型']()) }
           </TouchableOpacity>
           <View style={styles.listTextBlock}>
-            <Text ellipsizeMode='tail' numberOfLines={3} style={styles.listTitle}>
+            <Text ellipsizeMode='tail' numberOfLines={1} style={styles.listTitle}>
               { item.name }
             </Text>
-            <Text ellipsizeMode='tail' numberOfLines={3} style={styles.listDescription}>
+            <Text ellipsizeMode='tail' numberOfLines={1} style={styles.listDescription}>
               { item.en_name ? item.en_name : '(no english)' }
             </Text>
           </View>

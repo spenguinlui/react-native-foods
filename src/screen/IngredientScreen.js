@@ -57,8 +57,7 @@ export default function IngredientScreen ({navigation}) {
   const addToFavorites = async (item) => {
     try {
       const origin_favorites = await StorageHelper.getJsonArraySetting('favorites');
-      const find_data = origin_favorites.find((data) => data.id == item.id)
-      if (find_data) {
+      if (origin_favorites && origin_favorites.find((data) => data.id == item.id)) {
         alert('已經加入過了');
         return;
       }

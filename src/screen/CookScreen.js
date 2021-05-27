@@ -78,7 +78,7 @@ export default function CookScreen ({navigation}) {
     try {
       const oringinRecipe = await StorageHelper.getJsonArraySetting('recipe');
       if (!recipe.name) return;
-      if (oringinRecipe.find((item) => item.name === recipe.name)) {
+      if (oringinRecipe && oringinRecipe.find((item) => item.name === recipe.name)) {
         alert("食譜撞名囉！");
         return;
       }
