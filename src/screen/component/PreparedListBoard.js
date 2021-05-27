@@ -27,7 +27,7 @@ const PreparedListBoard = ({list, setListCountIsChange}) => {
       <Text style={ styles.title }>現有食材</Text>
       { list.map((item, index) => {
         return (
-          <View style={ styles.listBlock }>
+          <View style={ styles.listBlock } key={ index }>
             <View style={ styles.listLeftBlock }>
               <View><Text style={ styles.listText }>{index + 1} </Text></View>
               <View><Text style={ styles.listText }>{item.name}</Text></View>

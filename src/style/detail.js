@@ -23,7 +23,7 @@ export default StyleSheet.create({
     backgroundColor: BACKGROUND_COLOR,
   },
   topContent: {
-    marginTop: 80,
+    marginTop: 100,
     marginBottom: 10,
     display: 'flex',
     flexDirection: 'row'

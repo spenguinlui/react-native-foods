@@ -13,9 +13,11 @@ export default function RecipeScreen ({navigation}) {
   // todo: 讀取資料會有重複讀取問題, 要用 promise 把更新到 state的動作都包起來
   const loadStorageData = async () => {
     const gotData = await StorageHelper.getJsonArraySetting('recipe');
-    setRecipeData(gotData);
-    setRecipeCount(gotData.length);
-    console.log('得到資料了');
+    if (gotData) {
+      setRecipeData(gotData);
+      setRecipeCount(gotData.length);
+      console.log('得到資料了');
+    }
   }
 
   // 移除食譜

@@ -83,8 +83,8 @@ export default function CookScreen ({navigation}) {
         return;
       }
       StorageHelper.setJsonArraySetting('recipe', recipe);
-      setRecipe({name: '', ingredient: [], nutrient_content: []})
-      console.log("加入食譜成功");
+      setRecipe({name: '', ingredient: [], nutrient_content: []});
+      alert("成功儲存！");
     } catch(error) {
       console.log("加入食譜失敗", error);
     }

@@ -16,7 +16,7 @@ import HeaderList from './component/HeaderList'
 const getPageData = (num, ingredientType) => {
   const renderData = [];
   // for (let i = 0; i < DATA_COUNT_PER_PAGE; i++) { renderData.push(jsonData[ingredientType][i + ((num - 1 ) * 10) ]); }
-  for (let i = 0; i < num * DATA_COUNT_PER_PAGE; i++) { renderData.push(jsonData[ingredientType][i]); }
+  for (let i = 0; i < num * DATA_COUNT_PER_PAGE; i++) { jsonData[ingredientType][i] && renderData.push(jsonData[ingredientType][i]); }
   return renderData;
 }
 
@@ -130,7 +130,7 @@ export default function IngredientScreen ({navigation}) {
 
   // 當頁籤 or 食材類型改變時觸發
   useEffect(() => {
-    console.log(`現在筆數${pageNumber * 10}`)
+    console.log(`現在筆數${pageNumber * 10}`);
     loadData();
   }, [pageNumber, ingredientType])
 
