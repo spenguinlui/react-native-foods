@@ -8,7 +8,6 @@ const dataWithType = (data) => {
   let newNutrientData = [];
   data.map((item) => {
     let existType = newNutrientData.find(i => i.type === item.type);
-    console.log(item)
     if (!existType) {
       if (item.per_content > 0) newNutrientData.push({ type: item.type, content: [item] });
     } else {
@@ -29,10 +28,10 @@ export default function IngredientDetail (props) {
     <View style={ detailStyles.nutrientOuterBlock }>
       <View style={ detailStyles.nutrientBlock } key={nu_data.type}>
         <Text style={ detailStyles.nutrientTitleText }>{ nu_data.type }</Text>
-        { nu_data.content.map((nu_data_content) => {
+        { nu_data.content.map((nu_data_content, index) => {
           if (nu_data_content.per_content <= 0) return;
           return (
-            <View style={ detailStyles.nutrientList }>
+            <View style={ detailStyles.nutrientList } key={ index }>
               <View><Text style={ detailStyles.nutrientName }>{nu_data_content.name}</Text></View>
               <View style={ detailStyles.nutrientListText }>
                 <View><Text style={ detailStyles.valueText }> {Math.round(nu_data_content.per_content)}</Text></View>

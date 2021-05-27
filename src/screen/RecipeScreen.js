@@ -15,7 +15,7 @@ export default function RecipeScreen ({navigation}) {
     const gotData = await StorageHelper.getJsonArraySetting('recipe');
     setRecipeData(gotData);
     setRecipeCount(gotData.length);
-    console.log('得到資料了')
+    console.log('得到資料了');
   }
 
   // 移除食譜

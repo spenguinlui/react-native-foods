@@ -23,13 +23,13 @@ export default function RecipeDetail (props) {
   const data = props.route.params.data || {};
 
   const renderNutrientCard = (nu_data) => (
-    <View style={ detailStyles.nutrientOuterBlock }>
-      <View style={ detailStyles.nutrientBlock } key={nu_data.type}>
+    <View style={ detailStyles.nutrientOuterBlock } key={ nu_data.type }>
+      <View style={ detailStyles.nutrientBlock }>
         <Text style={ detailStyles.nutrientTitleText }>{ nu_data.type }</Text>
         { nu_data.content.map((nu_data_content) => {
           if (nu_data_content.per_content <= 0) return;
           return (
-            <View style={ detailStyles.nutrientList }>
+            <View style={ detailStyles.nutrientList } key={ nu_data_content.name }>
               <View><Text style={ detailStyles.nutrientName }>{nu_data_content.name}</Text></View>
               <View style={ detailStyles.nutrientListText }>
                 <View><Text style={ detailStyles.valueText }> {Math.round(nu_data_content.per_content)}</Text></View>
@@ -43,7 +43,7 @@ export default function RecipeDetail (props) {
   )
 
   return (
-    <View style={ detailStyles.container }>
+    <View style={ detailStyles.container } key={ data.name }>
       <View style={ detailStyles.circleBg }/>
       <View style={ detailStyles.topContent }>
         <View style={ detailStyles.nameBlock }>
@@ -52,7 +52,7 @@ export default function RecipeDetail (props) {
       </View>
       <View style={ detailStyles.listContainer }>
         { data.ingredient.map(({name, count}, index) => (
-          <View style={ [detailStyles.listBlock, { paddingLeft: index % 2 !== 0 ? 10 : 0 }] }>
+          <View style={ [detailStyles.listBlock, { paddingLeft: index % 2 !== 0 ? 10 : 0 }] } key={ index }>
             <Text style={ detailStyles.listText }>{ name }</Text>
             <Text style={ detailStyles.listText }> x { count || 1 }</Text>
           </View>

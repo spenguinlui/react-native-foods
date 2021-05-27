@@ -114,7 +114,7 @@ export default function FavoritesScreen ({navigation}) {
   useEffect(() => {
     const refreshFavorites = navigation.addListener('focus', () => {
       setDisableArrived('');  // 清空已點擊按鈕
-      console.log("切換進來的讀取")
+      console.log("切換進來的讀取");
       loadStorageData();
     });
     return refreshFavorites;

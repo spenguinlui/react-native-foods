@@ -10,7 +10,6 @@ export function addToPrepareCookingList(item) {
 }
 
 export function removeFromPrepareCookingList(item) {
-  console.log(`action ${item}`)
   return {
     type: REMOVE_FROM_PREPARECOOKING_LIST,
     payload: { prepareItem: item }
