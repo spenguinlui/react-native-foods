@@ -94,13 +94,15 @@ function RecipeStack () {
   return (
     <Stack.Navigator
         initialRouteName='Recipe'
-        screenOptions={ {
-          headerStyle: { backgroundColor: BACKGROUND_COLOR, shadowOpacity: 0 },
-          headerTitle: '我的食譜',
-          headerBackTitle: '上一頁',
-          headerTintColor: MAIN_COLOR
-        } }
-        mode={'modal'}
+        screenOptions={({route}) => (
+          {
+            headerStyle: { backgroundColor: BACKGROUND_COLOR, shadowOpacity: 0 },
+            headerTitle: route.name === 'RecipeDetail' ? '' : '我的食譜',
+            headerBackTitle: '上一頁',
+            headerTintColor: MAIN_COLOR,
+            headerTransparent: route.name === 'RecipeDetail' ? true : false
+          }
+        )}
       >
       <Stack.Screen name="Recipe" component={ RecipeScreen } />
       <Stack.Screen name="RecipeDetail" component={ RecipeDetail } />
@@ -135,7 +137,7 @@ const Router = () => (
               iconName = focused ? 'ios-list' : 'ios-list-outline'
           }
           return (
-            <Ionicons name={iconName} size={25} color={ focused ?MAIN_COLOR : 'gray' } />
+            <Ionicons name={iconName} size={25} color={ focused ? MAIN_COLOR : 'gray' } />
           )
         }
       }) }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, View, ScrollView, FlatList } from 'react-native';
+import { Text, View, FlatList } from 'react-native';
 import detailStyles from '../style/detail';
 
 import { bgImage, FoodConvertList } from '../setting';
@@ -8,6 +8,7 @@ const dataWithType = (data) => {
   let newNutrientData = [];
   data.map((item) => {
     let existType = newNutrientData.find(i => i.type === item.type);
+    console.log(item)
     if (!existType) {
       if (item.per_content > 0) newNutrientData.push({ type: item.type, content: [item] });
     } else {
@@ -23,6 +24,7 @@ const dataWithType = (data) => {
 
 export default function IngredientDetail (props) {
   const data = props.route.params.passProps || {};
+
   const renderNutrientCard = (nu_data) => (
     <View style={ detailStyles.nutrientOuterBlock }>
       <View style={ detailStyles.nutrientBlock } key={nu_data.type}>
@@ -42,8 +44,9 @@ export default function IngredientDetail (props) {
       </View>
     </View>
   )
+
   return (
-    <ScrollView style={detailStyles.container}>
+    <View style={detailStyles.container}>
       <View style={detailStyles.circleBg} />
       <View style={detailStyles.topContent}>
         <View>
@@ -62,7 +65,7 @@ export default function IngredientDetail (props) {
         { data.common_name ? <Text style={detailStyles.description}>俗名: {data.common_name}</Text> : <Text style={detailStyles.description} /> }
         <Text style={detailStyles.description}>{data.description}</Text>
       </View>
-      <View style={detailStyles.nutrientBoard}>
+      <View style={ detailStyles.nutrientBoard }>
         <FlatList
           data={dataWithType(data.nutrient_content)}
           renderItem={({item}) => renderNutrientCard(item)}
@@ -71,7 +74,7 @@ export default function IngredientDetail (props) {
           numColumns={2}
         />
       </View>
-    </ScrollView>
+    </View>
   )
 }
       {/*<Text>廢棄率: {data.abandonment_rate}</Text>*/}

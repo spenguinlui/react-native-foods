@@ -1,20 +1,72 @@
 import React from 'react';
-import { Text, View, ScrollView } from 'react-native';
-import styles from '../style/main';
+import { Text, View, FlatList } from 'react-native';
+import detailStyles from '../style/detail';
+
+const dataWithType = (data) => {
+  let newNutrientData = [];
+  data.map((item) => {
+    let existType = newNutrientData.find(i => i.type === item.type);
+    if (!existType) {
+      if (item.per_content > 0) newNutrientData.push({ type: item.type, content: [item] });
+    } else {
+      if (item.per_content > 0) existType.content.push(item);
+    }
+  })
+  newNutrientData.sort((a, b) => {
+    if (a.type > b.type) return 1;
+    if (a.type < b.type) return -1;
+  })
+  return newNutrientData;
+}
 
 export default function RecipeDetail (props) {
-  const data = props.route.params.data || {}
-  return (
-    <View>
-      <Text>我是食譜頁細節</Text>
-      <Text>食譜名稱: { data.name }</Text>
-      <Text>使用食材: { data.ingredient.map((name) => name) }</Text>
-      <Text style={{ paddingBottom: 10 }}>營養成分: { data.nutrient_content.length }</Text>
-      <ScrollView>
-        { data.nutrient_content.map((item) => {
-          return <Text key={item.name}>{ item.name } : { item.unit_content } 克</Text>
+  const data = props.route.params.data || {};
+
+  const renderNutrientCard = (nu_data) => (
+    <View style={ detailStyles.nutrientOuterBlock }>
+      <View style={ detailStyles.nutrientBlock } key={nu_data.type}>
+        <Text style={ detailStyles.nutrientTitleText }>{ nu_data.type }</Text>
+        { nu_data.content.map((nu_data_content) => {
+          if (nu_data_content.per_content <= 0) return;
+          return (
+            <View style={ detailStyles.nutrientList }>
+              <View><Text style={ detailStyles.nutrientName }>{nu_data_content.name}</Text></View>
+              <View style={ detailStyles.nutrientListText }>
+                <View><Text style={ detailStyles.valueText }> {Math.round(nu_data_content.per_content)}</Text></View>
+                <View><Text style={ detailStyles.unitText }> /g</Text></View>
+              </View>
+            </View>
+          )
         }) }
-      </ScrollView>
+      </View>
+    </View>
+  )
+
+  return (
+    <View style={ detailStyles.container }>
+      <View style={ detailStyles.circleBg }/>
+      <View style={ detailStyles.topContent }>
+        <View style={ detailStyles.nameBlock }>
+          <Text style={ detailStyles.name }>{ data.name }</Text>
+        </View>
+      </View>
+      <View style={ detailStyles.listContainer }>
+        { data.ingredient.map(({name, count}, index) => (
+          <View style={ [detailStyles.listBlock, { paddingLeft: index % 2 !== 0 ? 10 : 0 }] }>
+            <Text style={ detailStyles.listText }>{ name }</Text>
+            <Text style={ detailStyles.listText }> x { count || 1 }</Text>
+          </View>
+        )) }
+      </View>
+      <View style={ detailStyles.nutrientBoard }>
+        <FlatList
+          data={ dataWithType(data.nutrient_content) }
+          renderItem={ ({item}) => renderNutrientCard(item) }
+          keyExtractor={ (item, index) => index }
+          horizontal={ false }
+          numColumns={ 2 }
+        />
+      </View>
     </View>
   )
 }

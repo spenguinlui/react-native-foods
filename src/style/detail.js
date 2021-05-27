@@ -1,15 +1,14 @@
 import { StyleSheet, Dimensions } from 'react-native';
 import { MAIN_COLOR, MAIN_COLOR_2, SECONDARY_COLOR, BACKGROUND_COLOR } from '../setting';
 
+const windowWidth = Dimensions.get('window').width;
 const circleBgWidth = Dimensions.get('window').width * 1.5;
 const halfWidth = Dimensions.get('window').width * 0.5;
 
 export default StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
-    // alignItems: 'center',
-    // justifyContent: 'center',
+    backgroundColor: 'white'
   },
   circleBg: {
     position: 'absolute',
@@ -58,7 +57,27 @@ export default StyleSheet.create({
     color: 'gray',
     lineHeight: 24
   },
+  listContainer: {
+    marginHorizontal: 30,
+    marginTop: 5, 
+    marginBottom: 10,
+    display: 'flex',
+    flexDirection: 'row',
+    flexWrap: 'wrap'
+  },
+  listBlock: {
+    width: (windowWidth - (20 * 3)) /2,
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingRight: 10
+  },
+  listText: {
+    color: '#334443',
+    lineHeight: 20
+  },
   nutrientBoard: {
+    flex: 1,
     marginTop: 20,
     marginHorizontal: 10
   },
@@ -71,7 +90,6 @@ export default StyleSheet.create({
   nutrientBlock: {
     minHeight: 180,
     padding: 15,
-    // backgroundColor: BACKGROUND_COLOR,
     backgroundColor: 'white',
     borderColor: '#ffc93c',
     borderWidth: 2,

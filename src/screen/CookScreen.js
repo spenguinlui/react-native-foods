@@ -13,7 +13,7 @@ import PreparedListBoard from './component/PreparedListBoard'
 // 食材合成
 const ingredientMixing = (inputList, outputObj) => {
   inputList.forEach((item) => {
-    outputObj.ingredient.push(item.name);
+    outputObj.ingredient.push({ name: item.name, count: item.count});
     if (!item.nutrient_content) return;  // 如果沒有營養成分便跳過
 
     // 計算所有營養成分 todo: 目前是單份含量而已，還需要增加數目
@@ -23,7 +23,12 @@ const ingredientMixing = (inputList, outputObj) => {
       if (exisit_nutrient) {
         exisit_nutrient.unit_content += (parseFloat(nutrient_item.unit_content) * (item.count || 1));
       } else {
-        outputObj.nutrient_content.push({name: nutrient_item.name, unit_content: (parseFloat(nutrient_item.unit_content) * (item.count || 1))});
+        outputObj.nutrient_content.push(
+          { name: nutrient_item.name,
+            unit_content: (parseFloat(nutrient_item.unit_content) * (item.count || 1)),
+            ...nutrient_item
+          }
+        );
       }
     })
   });
@@ -72,7 +77,6 @@ export default function CookScreen ({navigation}) {
   const addRecipeToStorage = async () => {
     try {
       const oringinRecipe = await StorageHelper.getJsonArraySetting('recipe');
-      console.log(recipeName)
       if (!recipe.name) return;
       if (oringinRecipe.find((item) => item.name === recipe.name)) {
         alert("食譜撞名囉！");

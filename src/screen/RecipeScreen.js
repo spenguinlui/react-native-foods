@@ -37,8 +37,8 @@ export default function RecipeScreen ({navigation}) {
           <Text ellipsizeMode='tail' numberOfLines={3} style={styles.listTitle}>
             { item.name }
           </Text>
-          <Text ellipsizeMode='tail' numberOfLines={3} style={styles.listDescription}>
-            材料: { item.ingredient.map((name) => `${name} .`) }
+          <Text ellipsizeMode='tail' numberOfLines={1} style={styles.listDescription}>
+            材料: { item.ingredient.map(({name}) => `${name} .`) }
           </Text>
         </View>
         <TouchableOpacity style={styles.listIcon} onPress={() => removeRecipe(item)}>
