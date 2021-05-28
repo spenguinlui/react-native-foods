@@ -1,7 +1,13 @@
-import { ADD_TO_PREPARECOOKING_LIST, REMOVE_FROM_PREPARECOOKING_LIST, REMOVE_ALL_PREPARECOOKING_LIST } from './action'
+import { 
+  ADD_TO_PREPARECOOKING_LIST,
+  REMOVE_FROM_PREPARECOOKING_LIST,
+  REMOVE_ALL_PREPARECOOKING_LIST,
+  CHANGE_INSTRUCTION_PAGE
+} from './action'
 
 const initialState = {
-  prepareIdList: []
+  prepareIdList: [],
+  instructionPage: 0
 }
 
 export default function reducer(state = initialState, action) {
@@ -24,6 +30,11 @@ export default function reducer(state = initialState, action) {
       return {
         ...state,
         prepareIdList: []
+      }
+    case CHANGE_INSTRUCTION_PAGE:
+      return {
+        ...state,
+        instructionPage: action.payload.page
       }
     default:
       return state
