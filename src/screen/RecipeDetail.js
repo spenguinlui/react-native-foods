@@ -2,6 +2,7 @@ import React from 'react';
 import { Text, View, FlatList } from 'react-native';
 import detailStyles from '../style/detail';
 
+// 營養價值分類  --- type、content
 const dataWithType = (data) => {
   let newNutrientData = [];
   data.map((item) => {
@@ -11,28 +12,29 @@ const dataWithType = (data) => {
     } else {
       if (item.per_content > 0) existType.content.push(item);
     }
-  })
+  });
   newNutrientData.sort((a, b) => {
     if (a.type > b.type) return 1;
     if (a.type < b.type) return -1;
-  })
+  });
   return newNutrientData;
 }
 
 export default function RecipeDetail (props) {
   const data = props.route.params.data || {};
 
+  // 營養價值依類別分類 FlatList 卡片
   const renderNutrientCard = (nu_data) => (
     <View style={ detailStyles.nutrientOuterBlock } key={ nu_data.type }>
       <View style={ detailStyles.nutrientBlock }>
         <Text style={ detailStyles.nutrientTitleText }>{ nu_data.type }</Text>
         { nu_data.content.map((nu_data_content) => {
-          if (nu_data_content.per_content <= 0) return;
+          if (nu_data_content.per_content <= 0) return;  // 假設沒有值就不要顯示了
           return (
             <View style={ detailStyles.nutrientList } key={ nu_data_content.name }>
-              <View><Text style={ detailStyles.nutrientName }>{nu_data_content.name}</Text></View>
+              <View><Text style={ detailStyles.nutrientName }>{ nu_data_content.name }</Text></View>
               <View style={ detailStyles.nutrientListText }>
-                <View><Text style={ detailStyles.valueText }> {Math.round(nu_data_content.per_content)}</Text></View>
+                <View><Text style={ detailStyles.valueText }> { Math.round(nu_data_content.per_content) }</Text></View>
                 <View><Text style={ detailStyles.unitText }> /g</Text></View>
               </View>
             </View>

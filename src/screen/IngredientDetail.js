@@ -4,6 +4,7 @@ import detailStyles from '../style/detail';
 
 import { bgImage, FoodConvertList } from '../setting';
 
+// 營養價值分類  --- type、content
 const dataWithType = (data) => {
   let newNutrientData = [];
   data.map((item) => {
@@ -26,7 +27,7 @@ export default function IngredientDetail (props) {
 
   const renderNutrientCard = (nu_data) => (
     <View style={ detailStyles.nutrientOuterBlock }>
-      <View style={ detailStyles.nutrientBlock } key={nu_data.type}>
+      <View style={ detailStyles.nutrientBlock } key={ nu_data.type }>
         <Text style={ detailStyles.nutrientTitleText }>{ nu_data.type }</Text>
         { nu_data.content.map((nu_data_content, index) => {
           if (nu_data_content.per_content <= 0) return;
@@ -34,7 +35,7 @@ export default function IngredientDetail (props) {
             <View style={ detailStyles.nutrientList } key={ index }>
               <View><Text style={ detailStyles.nutrientName }>{nu_data_content.name}</Text></View>
               <View style={ detailStyles.nutrientListText }>
-                <View><Text style={ detailStyles.valueText }> {Math.round(nu_data_content.per_content)}</Text></View>
+                <View><Text style={ detailStyles.valueText }> { Math.round(nu_data_content.per_content) }</Text></View>
                 <View><Text style={ detailStyles.unitText }> /g</Text></View>
               </View>
             </View>
@@ -45,32 +46,32 @@ export default function IngredientDetail (props) {
   )
 
   return (
-    <View style={detailStyles.container}>
-      <View style={detailStyles.circleBg} />
-      <View style={detailStyles.topContent}>
+    <View style={ detailStyles.container }>
+      <View style={ detailStyles.circleBg } />
+      <View style={ detailStyles.topContent }>
         <View>
-          <View style={detailStyles.nameBlock}>
-            <Text style={detailStyles.name}>{data.name}</Text>
+          <View style={ detailStyles.nameBlock }>
+            <Text style={ detailStyles.name }>{ data.name }</Text>
           </View>
-          <View style={detailStyles.enNameBlock}>
-            <Text style={detailStyles.enName}>{data.en_name}</Text>
+          <View style={ detailStyles.enNameBlock }>
+            <Text style={ detailStyles.enName }>{ data.en_name }</Text>
           </View>
         </View>
         <View>
           { bgImage(FoodConvertList[data.food_type]() || FoodConvertList['未定義類型']()) }
         </View>
       </View>
-      <View style={detailStyles.descriptionBlock}>
-        { data.common_name ? <Text style={detailStyles.description}>俗名: {data.common_name}</Text> : <Text style={detailStyles.description} /> }
-        <Text style={detailStyles.description}>{data.description}</Text>
+      <View style={ detailStyles.descriptionBlock }>
+        { data.common_name ? <Text style={ detailStyles.description }>俗名: { data.common_name }</Text> : <Text style={ detailStyles.description } /> }
+        <Text style={ detailStyles.description }>{ data.description }</Text>
       </View>
       <View style={ detailStyles.nutrientBoard }>
         <FlatList
-          data={dataWithType(data.nutrient_content)}
-          renderItem={({item}) => renderNutrientCard(item)}
-          keyExtractor={(item, index) => index}
-          horizontal={false}
-          numColumns={2}
+          data={ dataWithType(data.nutrient_content) }
+          renderItem={ ({item}) => renderNutrientCard(item) }
+          keyExtractor={ (item, index) => index }
+          horizontal={ false }
+          numColumns={ 2 }
         />
       </View>
     </View>

@@ -1,13 +1,12 @@
-import React from 'react';
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Text, View, Image, StyleSheet } from 'react-native';
 
 import { useMappedState, useDispatch } from 'redux-react-hook';
 import { changeInstructionPage } from '../redux/action';
 
-import { BACKGROUND_COLOR } from '../setting';
 import Swiper from 'react-native-swiper'
 
+// 說明文件內容
 const msgArray = [
   'Step 1: 在食材清單挑選喜歡的食材，加入「 收藏 」或是列入「 準備 」食材。',
   'Step 2: 將食材列入「 準備 」食材中。',
@@ -16,6 +15,7 @@ const msgArray = [
   'Step 5: 完成後便可以在食譜中找到之前的料理。'
 ]
 
+// 說明文字
 const MsgText = () => {
   const instructionPage = useMappedState(state => state.instructionPage);
 
@@ -30,6 +30,7 @@ const MsgText = () => {
 export default function InstructionScreen ({navigation}) {
   const disPatch = useDispatch();
 
+  // 每一次進來頁面將頁次歸 0，防止與訊息不同步
   useEffect(() => {
     const resetPage = navigation.addListener('focus', () => disPatch(changeInstructionPage(0)));
     return resetPage;
@@ -41,7 +42,7 @@ export default function InstructionScreen ({navigation}) {
         <Swiper
           style={ swiper.wrapper }
           removeClippedSubviews={ true }
-          bounces={true}
+          bounces={ true }
           onIndexChanged={ index => disPatch(changeInstructionPage(index)) }
           paginationStyle={ { position: 'absolute', top: 420 } }
         >

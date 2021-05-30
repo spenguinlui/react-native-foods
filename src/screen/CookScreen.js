@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Text, View, Alert, Button, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { Text, View, Alert, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import common from '../style/main';
-import { MAIN_COLOR, MAIN_COLOR_2, SECONDARY_COLOR, BACKGROUND_COLOR } from '../setting'
+import { SECONDARY_COLOR } from '../setting'
 
 import * as StorageHelper from '../helper/StorageHelper';
 
@@ -10,13 +10,14 @@ import { removeAllPrepareCookingList } from '../redux/action';
 
 import PreparedListBoard from './component/PreparedListBoard'
 
-// 食材合成
+// 食材合成  ---> 料理
+// [ {name, ingredient: {name, count, }, nutrient_content: { name, unit_content, ...} }, {} ...]
 const ingredientMixing = (inputList, outputObj) => {
   inputList.forEach((item) => {
     outputObj.ingredient.push({ name: item.name, count: item.count});
     if (!item.nutrient_content) return;  // 如果沒有營養成分便跳過
 
-    // 計算所有營養成分 todo: 目前是單份含量而已，還需要增加數目
+    // 計算所有營養成分
     item.nutrient_content.forEach((nutrient_item) => {
       if (nutrient_item.unit_content <= 0 || nutrient_item.per_content <= 0) return; // 如果營養成分低於 0 不納入計算
       let exisit_nutrient = outputObj.nutrient_content.find(exisit_item => exisit_item.name === nutrient_item.name);
@@ -35,14 +36,22 @@ const ingredientMixing = (inputList, outputObj) => {
   return outputObj;
 }
 
+// 比對兩組陣列的 id 是否都相同，不計較順序 (用來確認目前的準備食材列表有沒有更新)
+const isSameIdForAll = (reduxList, stateList) => {
+  // reduxList 是 id 陣列, stateList 是 物件陣列
+  const resultA = reduxList.every(id => stateList.includes(id));
+  const resultB = stateList.every(item => reduxList.includes(item.id));
+  return resultA && resultB;
+}
+
 export default function CookScreen ({navigation}) {
-  const [recipe, setRecipe] = useState({name: '', ingredient: [], nutrient_content: []});
-  const [recipeName, setRecipeName] = useState('');
+  const [recipe, setRecipe] = useState({ name: '', ingredient: [], nutrient_content: [] }); // 存放煮好的料理資料
+  const [recipeName, setRecipeName] = useState('');   // 食譜名稱暫存，會在存進 recipe
 
   const [preparedList, setPreparedList] = useState([]);  // 用來存放得到的已準備食材
-  const [listCountIsChange, setListCountIsChange] = useState(false)
+  const [listCountIsChange, setListCountIsChange] = useState(false)  // 食材數量是否有新增/減少
 
-  const prepareIdList = useMappedState(state => state.prepareIdList);
+  const prepareIdList = useMappedState(state => state.prepareIdList); // 已準備食材列表(只放ID)
   const disPatch = useDispatch();
   
   // 確定是否烹煮 Alert
@@ -58,6 +67,7 @@ export default function CookScreen ({navigation}) {
 
   // 烹煮
   const cookFunc = async () => {
+    // 把準備食材合成 變成參數2 物件型態
     const newRecipe = ingredientMixing(preparedList, { name: '', ingredient: [], nutrient_content: [] });
 
     // 加入 state
@@ -86,24 +96,17 @@ export default function CookScreen ({navigation}) {
       setRecipe({name: '', ingredient: [], nutrient_content: []});
       alert("成功儲存！");
     } catch(error) {
-      console.log("加入食譜失敗", error);
+      // console.log("加入食譜失敗", error);
     }
-  }
-  // 比對兩組陣列的 id 是否都相同，不計較順序
-  const isSameIdForAll = (reduxList, stateList) => {
-    // reduxList 是 id 陣列, stateList 是 物件陣列
-    const resultA = reduxList.every(id => stateList.includes(id));
-    const resultB = stateList.every(item => reduxList.includes(item.id));
-    return resultA && resultB;
   }
 
   // 同步元件內 state 與 storage 資料
   const storagePreparedList = useCallback(async () => {
-    console.log(`準備清單長度:${prepareIdList.length},  準備數量: ${preparedList.length}`)
+    // console.log(`準備清單長度:${prepareIdList.length},  準備數量: ${preparedList.length}`)
 
     // 目前 render 的資料與 redux id 陣列不合才繼續
     if (isSameIdForAll(prepareIdList, preparedList)) return;
-    console.log("食譜更新", prepareIdList.length)
+    // console.log("食譜更新", prepareIdList.length)
 
     // 從 Storage 取得資料，並放入要 render 資料
     const getPrepareListData = await StorageHelper.getJsonArraySetting('prepared');
@@ -114,34 +117,34 @@ export default function CookScreen ({navigation}) {
   useEffect(() => {
     const refreshList = navigation.addListener('focus', () => storagePreparedList());
     return refreshList;
-  }, [storagePreparedList])
+  }, [storagePreparedList]);
 
   // 監聽某項目內的數量被改變就重新 render
   useEffect(() => {
     setListCountIsChange(false);
-  }, [listCountIsChange])
+  }, [listCountIsChange]);
 
   return (
-    <View style={common.container}>
+    <View style={ common.container }>
       { recipe.ingredient.length > 0 && (
         <View style={ styles.board }>
           <View><Text style={ styles.title }>料理完成</Text></View>
-          <TextInput style={styles.input} onChangeText={ (name) => syncrecipeName(name)} value={recipeName}></TextInput>
+          <TextInput style={ styles.input } onChangeText={ (name) => syncrecipeName(name)} value={ recipeName }></TextInput>
           <View style={ styles.buttonBlock}>
             { recipeName.length <= 0 ? 
-            <Text style={styles.text}>取個名字吧！</Text>
-            : <TouchableOpacity style={common.mainButton} onPress={ () => addRecipeToStorage() }>
-              <Text style={common.text}>保留食譜</Text>
+            <Text style={ styles.text }>取個名字吧！</Text>
+            : <TouchableOpacity style={ common.mainButton } onPress={ () => addRecipeToStorage() }>
+              <Text style={ common.text }>保留食譜</Text>
             </TouchableOpacity> 
             }
           </View>
         </View>
       )}
-      { preparedList.length ? <PreparedListBoard list={preparedList} setListCountIsChange={setListCountIsChange}/> : <View/> }
+      { preparedList.length ? <PreparedListBoard list={ preparedList } setListCountIsChange={ setListCountIsChange }/> : <View/> }
       <View style={{ marginTop: 40 }}>
         { preparedList.length ?
-          <TouchableOpacity style={common.mainButton} onPress={ IsCookAlert }>
-            <Text style={common.text}>開始料理</Text>
+          <TouchableOpacity style={ common.mainButton } onPress={ IsCookAlert }>
+            <Text style={ common.text }>開始料理</Text>
           </TouchableOpacity>
           : <View/>
         }

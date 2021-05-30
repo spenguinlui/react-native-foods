@@ -5,9 +5,10 @@ import {
   CHANGE_INSTRUCTION_PAGE
 } from './action'
 
+// 初始化 redux state
 const initialState = {
-  prepareIdList: [],
-  instructionPage: 0
+  prepareIdList: [],   // 存放準備中食材 ID  -- 食材、收藏、料理頁面都會用到
+  instructionPage: 0   // 說明頁面的輪播頁次  -- 首頁說明頁會用到
 }
 
 export default function reducer(state = initialState, action) {

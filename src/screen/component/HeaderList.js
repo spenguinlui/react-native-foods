@@ -1,18 +1,13 @@
-import React from 'react';
-import { useState } from 'react';
-import { View, ScrollView, TouchableOpacity } from 'react-native';
-import styles from '../../style/main';
+import React, { useState } from 'react';
+import { View, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
 
 import jsonData from '../../json/food_data.json';
-import { FoodConvertList, DEFAULT_FOOD_TYPE, IconImage } from '../../setting';
+import { DEFAULT_FOOD_TYPE, IconImage, MAIN_COLOR_2 } from '../../setting';
 
-
-// 食物中英文置換
-const foodTypeToZhTw = (title) => FoodConvertList[title]() || FoodConvertList['default']();
-
+// 用於 IngredientScreen
 const HeaderList = (props) => {
-  const headerArray = Object.keys(jsonData);
-  const [activeIcon, setActiveIcon] = useState(DEFAULT_FOOD_TYPE);
+  const headerArray = Object.keys(jsonData);     // 這裡也要讀取一次原始 json資料(的key)
+  const [activeIcon, setActiveIcon] = useState(DEFAULT_FOOD_TYPE);  // 現在所選食材類型
 
   const changeIngredientType = (title) => {
     props.setIngredientType(title);
@@ -23,12 +18,12 @@ const HeaderList = (props) => {
   return (
     <View>
       <ScrollView
-        style={styles.header}
+        style={ styles.header }
         horizontal={ true }
         contentContainerStyle={{ alignItems: 'center' }}
       >
       { headerArray.map((title) => {
-        if (title === 'undefined') return;  // 按下去會掛掉 todo: 待修正
+        if (title === 'undefined') return;  // 按下去會掛掉 todo: 待修正，原始資料好像不用特地加一個 undefined 的空物件
         return (
           <TouchableOpacity key={title} onPress={ () => changeIngredientType(title) }>
             <View style={ activeIcon === title ? styles.headerActiveIcon : styles.headerIcon } >
@@ -42,8 +37,24 @@ const HeaderList = (props) => {
   )
 }
 
-export default HeaderList;
+const styles = StyleSheet.create({
+  header: {
+    height: 70,
+    paddingLeft: 10,
+    marginVertical: 10,
+  },
+  headerIcon: {
+    marginRight: 10,
+    padding: 5,
+    backgroundColor: 'white',
+    borderRadius: 50
+  },
+  headerActiveIcon: {
+    marginRight: 10,
+    padding: 10,
+    backgroundColor: MAIN_COLOR_2,
+    borderRadius: 50
+  }
+});
 
-// <View>
-//         <Text>現在食材類型是: { foodTypeToZhTw(activeIcon) }</Text>
-//       </View>
+export default HeaderList;

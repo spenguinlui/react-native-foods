@@ -10,13 +10,12 @@ import { useMappedState, useDispatch } from 'redux-react-hook';
 import { addToPrepareCookingList, removeFromPrepareCookingList } from '../redux/action';
 
 export default function FavoritesScreen ({navigation}) {
-  const [dataSource, setDataSource] = useState([]);
-  const [disableArrived, setDisableArrived] = useState('');
+  const [dataSource, setDataSource] = useState([]);         // 主要存放資料
+  const [disableArrived, setDisableArrived] = useState(''); // 避免重複點擊 push 至 detail
   const [preparedCount, setPreparedCount] = useState(0);    // 用來記錄現在已準備食材數量
   const [favoritesCount, setFavoritesCount] = useState(0);  // 用來記錄現在我的最愛數量
 
-  const prepareIdList = useMappedState(state => state.prepareIdList);
-
+  const prepareIdList = useMappedState(state => state.prepareIdList);  // 已準備食材列表(只放ID)
   const disPatch = useDispatch();
 
   // 讀取儲存資料
@@ -51,7 +50,7 @@ export default function FavoritesScreen ({navigation}) {
       await StorageHelper.removeJsonArraySetting('favorites', item);
       setFavoritesCount(favoritesCount - 1);
     } catch(error) {
-      console.log('移除失敗', error);
+      // console.log('移除失敗', error);
     }
   }
 
@@ -63,9 +62,9 @@ export default function FavoritesScreen ({navigation}) {
         await disPatch(removeFromPrepareCookingList(item.id));
         await StorageHelper.patchJsonArraySetting('favorites', item);
         setPreparedCount(preparedCount - 1);
-        console.log('移除待煮成功');
+        // console.log('移除待煮成功');
       } catch(error) {
-        console.log('移除待煮清單失敗', error);
+        // console.log('移除待煮清單失敗', error);
       }
     } else {
       try {
@@ -73,9 +72,9 @@ export default function FavoritesScreen ({navigation}) {
         await disPatch(addToPrepareCookingList(item.id));
         await StorageHelper.patchJsonArraySetting('favorites', item);
         setPreparedCount(preparedCount + 1);
-        console.log('加入待煮成功');
+        // console.log('加入待煮成功');
       } catch(error) {
-        console.log('加入待煮清單失敗', error);
+        // console.log('加入待煮清單失敗', error);
       }
     }
   }
@@ -83,26 +82,26 @@ export default function FavoritesScreen ({navigation}) {
   const renderIngredient = (item) => (
     <TouchableOpacity
       onPress={ () => goIngredientDetail(item) }
-      key={item.id}
-      disabled={ disableArrived == item.id ? true : false }
+      key={ item.id }
+      disabled={ disableArrived === item.id }
     >
-      <View style={styles.mainList}>
-        <View style={styles.listView}>
-          <TouchableOpacity style={styles.listTypeIcon}>
+      <View style={ styles.mainList }>
+        <View style={ styles.listView }>
+          <TouchableOpacity style={ styles.listTypeIcon }>
             { IconImage(FoodConvertList[item.food_type]() || FoodConvertList['未定義類型']()) }
           </TouchableOpacity>
-          <View style={styles.listTextBlock}>
-            <Text ellipsizeMode='tail' numberOfLines={1} style={styles.listTitle}>
+          <View style={ styles.listTextBlock }>
+            <Text ellipsizeMode='tail' numberOfLines={ 1 } style={ styles.listTitle }>
               { item.name }
             </Text>
-            <Text ellipsizeMode='tail' numberOfLines={1} style={styles.listDescription}>
+            <Text ellipsizeMode='tail' numberOfLines={ 1 } style={ styles.listDescription }>
               { item.en_name ? item.en_name : '(no english)' }
             </Text>
           </View>
-          <TouchableOpacity style={styles.listIcon} onPress={() => preparedCookingListHandler(item)}>
-            <Ionicons name={ item.prepared === true ? 'ios-bookmark' : 'ios-bookmark-outline' } size={25} />
+          <TouchableOpacity style={ styles.listIcon } onPress={ () => preparedCookingListHandler(item) }>
+            <Ionicons name={ item.prepared === true ? 'ios-bookmark' : 'ios-bookmark-outline' } size={ 25 } />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.listIcon} onPress={() => removeFromFavorites(item)}>
+          <TouchableOpacity style={ styles.listIcon } onPress={ () => removeFromFavorites(item) }>
             <Ionicons name={'ios-trash-outline'} size={25} />
           </TouchableOpacity>
         </View>
@@ -113,8 +112,8 @@ export default function FavoritesScreen ({navigation}) {
   // 每次切換進來讀取資料 & 讓曾點過細節按鈕可以再點
   useEffect(() => {
     const refreshFavorites = navigation.addListener('focus', () => {
+      // console.log("切換進來的讀取");
       setDisableArrived('');  // 清空已點擊按鈕
-      console.log("切換進來的讀取");
       loadStorageData();
     });
     return refreshFavorites;
@@ -127,14 +126,14 @@ export default function FavoritesScreen ({navigation}) {
   }, [favoritesCount, preparedCount])
 
   return (
-    <View style={styles.listContainer}>
+    <View style={ styles.listContainer }>
       <FlatList
-        data={dataSource}
-        renderItem={({item}) => renderIngredient(item)}
-        keyExtractor={(item) => item.id}
-        getItemLayout={(data, index) => (
-          {length: 80, offset: 80 * index, index}
-        )}
+        data={ dataSource }
+        renderItem={ ({item}) => renderIngredient(item) }
+        keyExtractor={ (item) => item.id }
+        getItemLayout={ (data, index) => (
+          { length: 80, offset: 80 * index, index }
+        ) }
       />
     </View>
   )

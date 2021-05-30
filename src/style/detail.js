@@ -1,5 +1,5 @@
 import { StyleSheet, Dimensions } from 'react-native';
-import { MAIN_COLOR, MAIN_COLOR_2, SECONDARY_COLOR, BACKGROUND_COLOR } from '../setting';
+import { MAIN_COLOR, SECONDARY_COLOR, BACKGROUND_COLOR } from '../setting';
 
 const windowWidth = Dimensions.get('window').width;
 const circleBgWidth = Dimensions.get('window').width * 1.5;

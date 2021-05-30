@@ -1,10 +1,14 @@
 import React from 'react';
-import { Text, View, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import { Text, View, TouchableOpacity, StyleSheet } from 'react-native';
 import { SECONDARY_COLOR, MAX_PREPARED_COUNT } from '../../setting'
 
 import * as StorageHelper from '../../helper/StorageHelper';
 
+// 用在 CookScreen 元件中
+// 每一次改變都運用父元件傳入的 setListCountIsChange (true/false) 來重新 render
 const PreparedListBoard = ({list, setListCountIsChange}) => {
+
+  // 減少數量
   const decreaseItemCount = async (index) => {
     let newList = list;
     if (!newList[index].count) newList[index].count = 1;
@@ -13,6 +17,8 @@ const PreparedListBoard = ({list, setListCountIsChange}) => {
     await StorageHelper.patchJsonArraySetting('prepared', newList[index]);
     setListCountIsChange(true);
   }
+
+  // 增加數量
   const increaseItemCount = async (index) => {
     let newList = list;
     if (!newList[index].count) newList[index].count = 1;
@@ -29,8 +35,8 @@ const PreparedListBoard = ({list, setListCountIsChange}) => {
         return (
           <View style={ styles.listBlock } key={ index }>
             <View style={ styles.listLeftBlock }>
-              <View><Text style={ styles.listText }>{index + 1} </Text></View>
-              <View><Text style={ styles.listText }>{item.name}</Text></View>
+              <View><Text style={ styles.listText }>{ index + 1 } </Text></View>
+              <View><Text style={ styles.listText }>{ item.name }</Text></View>
             </View>
             <View style={ styles.listRightBlock }>
               <TouchableOpacity onPress={ () => decreaseItemCount(index) }>

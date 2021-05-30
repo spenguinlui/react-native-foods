@@ -6,20 +6,20 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-import { MAIN_COLOR, BACKGROUND_COLOR } from './setting'
+import { MAIN_COLOR, BACKGROUND_COLOR } from './setting';
 
 // 元件
-import HomeScreen from './screen/HomeScreen'
-import InstructionScreen from './screen/InstructionScreen'
+import HomeScreen from './screen/HomeScreen';
+import InstructionScreen from './screen/InstructionScreen';
 
-import IngredientScreen from './screen/IngredientScreen'
-import IngredientDetail from './screen/IngredientDetail'
+import IngredientScreen from './screen/IngredientScreen';
+import IngredientDetail from './screen/IngredientDetail';
 
-import FavoriteScreen from './screen/FavoriteScreen'
-import CookScreen from './screen/CookScreen'
+import FavoriteScreen from './screen/FavoriteScreen';
+import CookScreen from './screen/CookScreen';
 
-import RecipeScreen from './screen/RecipeScreen'
-import RecipeDetail from './screen/RecipeDetail'
+import RecipeScreen from './screen/RecipeScreen';
+import RecipeDetail from './screen/RecipeDetail';
 
 // 建構導覽物件
 const Tab = createBottomTabNavigator();
@@ -55,7 +55,7 @@ function IngredientStack () {
             headerTitle: route.name === 'IngredientDetail' ? '' : '食材清單',
             headerBackTitle: '上一頁',
             headerTintColor: MAIN_COLOR,
-            headerTransparent: route.name === 'IngredientDetail' ? true : false
+            headerTransparent: route.name === 'IngredientDetail'
           }
         )}
       >
@@ -76,7 +76,7 @@ function FavoriteStack () {
             headerTitle: route.name === 'IngredientDetail' ? '' : '食材收藏櫃',
             headerBackTitle: '上一頁',
             headerTintColor: MAIN_COLOR,
-            headerTransparent: route.name === 'IngredientDetail' ? true : false
+            headerTransparent: route.name === 'IngredientDetail'
           }
         )}
       >
@@ -100,7 +100,7 @@ function RecipeStack () {
             headerTitle: route.name === 'RecipeDetail' ? '' : '我的食譜',
             headerBackTitle: '上一頁',
             headerTintColor: MAIN_COLOR,
-            headerTransparent: route.name === 'RecipeDetail' ? true : false
+            headerTransparent: route.name === 'RecipeDetail'
           }
         )}
       >
@@ -137,7 +137,7 @@ const Router = () => (
               iconName = focused ? 'ios-list' : 'ios-list-outline'
           }
           return (
-            <Ionicons name={iconName} size={25} color={ focused ? MAIN_COLOR : 'gray' } />
+            <Ionicons name={ iconName } size={ 25 } color={ focused ? MAIN_COLOR : 'gray' } />
           )
         }
       }) }
