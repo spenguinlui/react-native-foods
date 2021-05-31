@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Text, View, TouchableOpacity, FlatList } from 'react-native';
+import { Text, View, Alert, TouchableOpacity, FlatList } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import styles from '../style/main';
 
@@ -19,6 +19,17 @@ export default function RecipeScreen ({navigation}) {
       // console.log('得到資料了');
     }
   };
+
+  // 確定是否移除 我的最愛
+  const removeAlert = (item) =>
+    Alert.alert(
+      "確定要刪除食譜嗎？",
+      "",
+      [
+        { text: "確定", onPress: () => removeRecipe(item), style: "cancel" },
+        { text: "再想想" }
+      ]
+    )
 
   // 移除食譜
   const removeRecipe = async (item) => {
@@ -43,7 +54,7 @@ export default function RecipeScreen ({navigation}) {
             材料: { item.ingredient.map(({name}) => `${name} .`) }
           </Text>
         </View>
-        <TouchableOpacity style={ styles.listIcon } onPress={ () => removeRecipe(item) }>
+        <TouchableOpacity style={ styles.listIcon } onPress={ () => removeAlert(item) }>
           <Ionicons name={'ios-trash-outline'} size={25} />
         </TouchableOpacity>
       </View>

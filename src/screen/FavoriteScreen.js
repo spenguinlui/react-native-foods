@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Text, View, TouchableOpacity, FlatList } from 'react-native';
+import { Text, View, Alert, TouchableOpacity, FlatList } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import styles from '../style/main';
 
@@ -43,6 +43,17 @@ export default function FavoritesScreen ({navigation}) {
     setDisableArrived(item.id);
     navigation.push('IngredientDetail', { passProps: item, key: item.id });
   }
+
+  // 確定是否移除 我的最愛
+  const removeAlert = (item) =>
+    Alert.alert(
+      "確定要刪除收藏嗎？",
+      "",
+      [
+        { text: "確定", onPress: () => removeFromFavorites(item), style: "cancel" },
+        { text: "再想想" }
+      ]
+    )
 
   // 移除我的最愛，要同步 redux 數量
   const removeFromFavorites = async (item) => {
@@ -101,8 +112,8 @@ export default function FavoritesScreen ({navigation}) {
           <TouchableOpacity style={ styles.listIcon } onPress={ () => preparedCookingListHandler(item) }>
             <Ionicons name={ item.prepared === true ? 'ios-bookmark' : 'ios-bookmark-outline' } size={ 25 } />
           </TouchableOpacity>
-          <TouchableOpacity style={ styles.listIcon } onPress={ () => removeFromFavorites(item) }>
-            <Ionicons name={'ios-trash-outline'} size={25} />
+          <TouchableOpacity style={ styles.listIcon } onPress={ () => removeAlert(item) }>
+            <Ionicons name={'ios-trash-outline'} size={ 25 } />
           </TouchableOpacity>
         </View>
       </View>

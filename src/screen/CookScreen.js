@@ -61,7 +61,7 @@ export default function CookScreen ({navigation}) {
       "",
       [
         { text: "確定", onPress: () => cookFunc(), style: "cancel" },
-        { text: "再想想", onPress: () => console.log("先不煮") }
+        { text: "再想想" }
       ]
     )
 
