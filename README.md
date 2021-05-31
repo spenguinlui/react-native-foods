@@ -1,5 +1,22 @@
 # React Native 練習作品
 
+## 畫面呈現
+
+首頁、食材清單、食材收藏
+
+---
+![](https://github.com/spenguinlui/react-native-foods/blob/master/page1.png)
+
+料理、食譜
+
+---
+![](https://github.com/spenguinlui/react-native-foods/blob/master/page2.png)
+
+品項細節
+
+---
+![](https://github.com/spenguinlui/react-native-foods/blob/master/page3.png)
+
 ## 資料來源
 [政府資料開放平臺](https://data.gov.tw/dataset/8543)
 
